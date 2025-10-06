@@ -18,6 +18,29 @@ import dupatta1 from "@/assets/dupatta-1.jpg";
 import kidsLehenga from "@/assets/kids-lehenga.jpg";
 import indoWesternGown from "@/assets/indo-western-gown.jpg";
 
+// Helper function to generate product variations
+const generateProductVariations = (baseProduct: Omit<Product, 'id'>, count: number): Product[] => {
+  const variations: Product[] = [];
+  const colors = ['Red', 'Blue', 'Green', 'Pink', 'Purple', 'Gold', 'Maroon', 'Navy', 'Coral', 'Teal'];
+  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+  
+  for (let i = 0; i < count; i++) {
+    variations.push({
+      ...baseProduct,
+      id: baseProduct.id + i,
+      name: `${baseProduct.name} - ${colors[i % colors.length]}`,
+      price: baseProduct.price + (i * 500), // Vary price slightly
+      colors: [colors[i % colors.length], colors[(i + 1) % colors.length]],
+      sizes: baseProduct.sizes || sizes.slice(0, 3 + (i % 4)),
+      rating: Math.max(3.5, Math.min(5, (baseProduct.rating || 4) + (Math.random() - 0.5) * 0.5)),
+      reviews: (baseProduct.reviews || 50) + Math.floor(Math.random() * 100),
+      isNew: i < 3, // First 3 variations are new
+      discount: i % 4 === 0 ? Math.floor(Math.random() * 20) + 5 : undefined,
+    });
+  }
+  return variations;
+};
+
 // Mock product data - in real app, this would come from API
 export const PRODUCTS: Product[] = [
   // Sarees
@@ -412,6 +435,29 @@ export const PRODUCTS: Product[] = [
     origin: "Made in India"
   }
 ];
+
+// Generate expanded product catalog for pagination
+const baseProducts = PRODUCTS;
+const expandedProducts: Product[] = [];
+
+// Duplicate each base product with variations to create a larger catalog
+baseProducts.forEach((product, index) => {
+  // Add the original product
+  expandedProducts.push(product);
+  
+  // Generate 4-6 variations of each product
+  const variationCount = 4 + (index % 3); // 4-6 variations
+  const variations = generateProductVariations(product, variationCount);
+  expandedProducts.push(...variations);
+});
+
+// Export the expanded product catalog
+export const ALL_PRODUCTS = expandedProducts;
+
+// Get all products
+export const getAllProducts = (): Product[] => {
+  return ALL_PRODUCTS;
+};
 
 // Sort options following Open/Closed Principle
 export const SORT_OPTIONS: SortOption[] = [

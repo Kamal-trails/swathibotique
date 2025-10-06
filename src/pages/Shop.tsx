@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import Pagination from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -16,7 +17,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { FilterSidebar } from "@/components/filters/FilterSidebar";
 import { SearchBar } from "@/components/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
-import { getFilterOptions, SORT_OPTIONS } from "@/services/productService";
+import { usePagination } from "@/hooks/usePagination";
+import { getFilterOptions, SORT_OPTIONS, getAllProducts } from "@/services/productService";
 import { getPopularSearches } from "@/services/searchService";
 import saree1 from "@/assets/saree-1.jpg";
 import saree2 from "@/assets/saree-2.jpg";
@@ -35,6 +37,9 @@ const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   
+  // Get all products from expanded catalog
+  const allProducts = getAllProducts();
+  
   // Use search hook for global state management
   const {
     query,
@@ -50,8 +55,26 @@ const Shop = () => {
     isSearching
   } = useSearch();
   
+  // Use pagination hook
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    totalItems,
+    goToPage,
+    nextPage,
+    prevPage,
+    canGoNext,
+    canGoPrev,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    items: filteredProducts,
+    itemsPerPage: 12,
+  });
+  
   const popularSearches = getPopularSearches();
-  const filterOptions = getFilterOptions(filteredProducts);
+  const filterOptions = getFilterOptions(allProducts);
 
   // Handle URL search params
   useEffect(() => {
@@ -114,8 +137,8 @@ const Shop = () => {
             </h1>
             <p className="text-muted-foreground">
               {currentSearchQuery 
-                ? `Found ${filteredProducts.length} products matching your search`
-                : "Discover our exquisite range of ethnic and fusion wear"
+                ? `Found ${totalItems} products matching your search`
+                : `Discover our exquisite range of ${totalItems} ethnic and fusion wear items`
               }
             </p>
             
@@ -140,7 +163,7 @@ const Shop = () => {
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
               <p className="text-muted-foreground">
-                Showing <span className="font-semibold text-foreground">{filteredProducts.length}</span> products
+                Showing <span className="font-semibold text-foreground">{startIndex}-{endIndex}</span> of <span className="font-semibold text-foreground">{totalItems}</span> products
                 {currentSearchQuery && (
                   <span className="ml-2 text-sm">
                     for "<span className="font-medium">{currentSearchQuery}</span>"
@@ -209,24 +232,28 @@ const Shop = () => {
 
               {/* Products Grid */}
               <div className="flex-1">
-                {filteredProducts.length > 0 ? (
+                {paginatedItems.length > 0 ? (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredProducts.map((product) => (
+                      {paginatedItems.map((product) => (
                         <ProductCard key={product.id} {...product} />
                       ))}
                     </div>
 
                     {/* Pagination */}
-                    <div className="mt-12 flex justify-center">
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Previous</Button>
-                        <Button size="sm" className="btn-gold">1</Button>
-                        <Button variant="outline" size="sm">2</Button>
-                        <Button variant="outline" size="sm">3</Button>
-                        <Button variant="outline" size="sm">Next</Button>
+                    {totalPages > 1 && (
+                      <div className="mt-12">
+                        <Pagination
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          onPageChange={goToPage}
+                          onNext={nextPage}
+                          onPrev={prevPage}
+                          canGoNext={canGoNext}
+                          canGoPrev={canGoPrev}
+                        />
                       </div>
-                    </div>
+                    )}
                   </>
                 ) : (
                   <div className="text-center py-12">

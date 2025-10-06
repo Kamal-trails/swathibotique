@@ -7,7 +7,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Product, ProductFilter } from "@/types/product";
 import { SearchResult, searchProducts, getSearchSuggestions } from "@/services/searchService";
-import { PRODUCTS, filterProducts, SORT_OPTIONS } from "@/services/productService";
+import { getAllProducts, filterProducts, SORT_OPTIONS } from "@/services/productService";
 
 interface UseSearchReturn {
   // Search state
@@ -81,16 +81,19 @@ export const useSearch = (): UseSearchReturn => {
     // This will trigger the useMemo below
   }, []);
 
+  // Get all products for search
+  const allProducts = getAllProducts();
+
   // Get search suggestions
   const suggestions = useMemo(() => {
     if (query.length < 2) return [];
-    return getSearchSuggestions(PRODUCTS, query, 5);
-  }, [query]);
+    return getSearchSuggestions(allProducts, query, 5);
+  }, [query, allProducts]);
 
   // Perform search and get results
   const searchResults = useMemo(() => {
     if (!query.trim()) {
-      return PRODUCTS.map(product => ({
+      return allProducts.map(product => ({
         product,
         score: 1,
         matchedFields: [],
@@ -98,7 +101,7 @@ export const useSearch = (): UseSearchReturn => {
       }));
     }
     
-    return searchProducts(PRODUCTS, query);
+    return searchProducts(allProducts, query);
   }, [query]);
 
   // Apply filters to search results
