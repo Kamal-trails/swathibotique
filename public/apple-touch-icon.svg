@@ -1,1 +1,29 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="180" height="180" rx="34" fill="#2C2C2C"/><path d="M45 45h90v10H45V45z" fill="#D4AF37"/><path d="M45 67h67v10H45V67z" fill="#D4AF37"/><path d="M45 89h45v10H45V89z" fill="#D4AF37"/><path d="M45 111h23v10H45V111z" fill="#D4AF37"/><path d="M45 135h11v10H45V135z" fill="#D4AF37"/><path d="M113 135c0 12.4-10.1 22.5-22.5 22.5S68 147.4 68 135v-11h10v11c0 6.9 5.6 12.5 12.5 12.5S103 141.9 103 135v-11h10v11z" fill="#D4AF37"/><circle cx="135" cy="56" r="8.5" fill="#D4AF37" opacity="0.7"/><circle cx="146" cy="67" r="5.6" fill="#D4AF37" opacity="0.5"/><circle cx="141" cy="78" r="4.5" fill="#D4AF37" opacity="0.3"/></svg>
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <rect width="180" height="180" rx="36" fill="#2C2C2C"/>
+  
+  <!-- Dress form/mannequin -->
+  <!-- Torso -->
+  <path d="M90 34c-14 0-25 11-25 25v6c0 8 6 14 14 14h22c8 0 14-6 14-14v-6c0-14-11-25-25-25z" fill="#FF6B6B"/>
+  
+  <!-- Waist line -->
+  <line x1="68" y1="78" x2="112" y2="78" stroke="#E0E0E0" stroke-width="2"/>
+  
+  <!-- Lower torso -->
+  <path d="M68 78c0 11 8 19 19 19h6c11 0 19-8 19-19v-6h-44v6z" fill="#FF6B6B"/>
+  
+  <!-- Stand pole -->
+  <rect x="87" y="98" width="6" height="34" fill="#E0E0E0"/>
+  
+  <!-- Ornate base -->
+  <path d="M45 135c0-6 6-11 11-11h68c6 0 11 5 11 11v6c0 6-5 11-11 11H56c-6 0-11-5-11-11v-6z" fill="#E0E0E0"/>
+  
+  <!-- Decorative scrolls -->
+  <path d="M34 140c0-3 3-6 6-6s6 3 6 6v3c0 3-3 6-6 6s-6-3-6-6v-3z" fill="#D0D0D0"/>
+  <path d="M134 140c0-3 3-6 6-6s6 3 6 6v3c0 3-3 6-6 6s-6-3-6-6v-3z" fill="#D0D0D0"/>
+  
+  <!-- Boutique accents -->
+  <circle cx="146" cy="45" r="6" fill="#D4AF37" opacity="0.8"/>
+  <circle cx="34" cy="56" r="4" fill="#D4AF37" opacity="0.6"/>
+  <circle cx="150" cy="70" r="3" fill="#D4AF37" opacity="0.4"/>
+</svg>
