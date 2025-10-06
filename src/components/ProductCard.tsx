@@ -18,7 +18,7 @@ const ProductCard = ({ id, name, price, image, category, isNew, discount }: Prod
   const discountedPrice = discount ? price - (price * discount) / 100 : null;
 
   return (
-    <div className="card-product">
+    <div className="card-product group">
       <Link to={`/product/${id}`}>
         <div className="relative overflow-hidden aspect-[4/5]">
           <img
@@ -76,15 +76,15 @@ const ProductCard = ({ id, name, price, image, category, isNew, discount }: Prod
           {discountedPrice ? (
             <>
               <span className="font-heading text-lg font-semibold text-accent">
-                ${discountedPrice.toFixed(2)}
+                ₹{discountedPrice.toFixed(0)}
               </span>
               <span className="text-sm text-muted-foreground line-through">
-                ${price.toFixed(2)}
+                ₹{price.toFixed(0)}
               </span>
             </>
           ) : (
             <span className="font-heading text-lg font-semibold">
-              ${price.toFixed(2)}
+              ₹{price.toFixed(0)}
             </span>
           )}
         </div>

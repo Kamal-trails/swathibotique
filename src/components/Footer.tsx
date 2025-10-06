@@ -14,7 +14,7 @@ const Footer = () => {
               JAANU <span className="text-accent">BOUTIQUE</span>
             </h3>
             <p className="text-muted-foreground mb-4">
-              Discover sophisticated fashion and timeless elegance. Your destination for curated style.
+              Celebrating India's rich textile heritage through exquisite sarees, lehengas, and ethnic wear.
             </p>
             <div className="flex gap-3">
               <a href="#" className="hover:text-accent transition-colors">
@@ -39,13 +39,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/new-arrivals" className="text-muted-foreground hover:text-accent transition-colors">
-                  New Arrivals
+                <Link to="/shop?category=ethnic" className="text-muted-foreground hover:text-accent transition-colors">
+                  Ethnic Wear
                 </Link>
               </li>
               <li>
-                <Link to="/collections" className="text-muted-foreground hover:text-accent transition-colors">
-                  Collections
+                <Link to="/shop?category=bridal" className="text-muted-foreground hover:text-accent transition-colors">
+                  Bridal Collection
                 </Link>
               </li>
               <li>
@@ -97,7 +97,7 @@ const Footer = () => {
           <div>
             <h4 className="font-heading text-lg font-semibold mb-4">Stay Connected</h4>
             <p className="text-muted-foreground mb-4">
-              Subscribe to receive updates, access to exclusive deals, and more.
+              Subscribe to receive updates on new collections, festive offers, and styling tips.
             </p>
             <form className="flex flex-col gap-2">
               <Input type="email" placeholder="Your email" />
@@ -106,7 +106,7 @@ const Footer = () => {
             <div className="mt-6 space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 98765 43210</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4" />

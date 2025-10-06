@@ -13,7 +13,7 @@ const About = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="font-heading text-4xl md:text-6xl font-bold mb-6">Our Story</h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Where timeless elegance meets modern sophistication
+              Where traditional Indian artistry meets contemporary elegance
             </p>
           </div>
         </section>
@@ -26,19 +26,21 @@ const About = () => {
             </h2>
             <div className="prose prose-lg max-w-none space-y-6 text-muted-foreground">
               <p className="text-lg leading-relaxed">
-                Founded with a passion for elegant fashion and timeless style, JAANU BOUTIQUE has been curating 
-                exceptional pieces for the discerning fashionista since our inception. Our journey began with a 
-                simple vision: to create a destination where quality meets style, and every piece tells a story.
+                Founded with a passion for preserving and celebrating Indian ethnic fashion, JAANU BOUTIQUE has been 
+                curating exquisite sarees, lehengas, and traditional wear for the discerning connoisseur. Our journey 
+                began with a simple vision: to create a destination where India's rich textile heritage meets 
+                contemporary style, and every piece tells a story of craftsmanship.
               </p>
               <p className="text-lg leading-relaxed">
-                We believe that fashion is more than just clothing—it's a form of self-expression, confidence, 
-                and art. Each item in our collection is carefully selected to embody sophistication while remaining 
-                accessible and wearable for everyday life.
+                We believe that ethnic wear is more than just clothing—it's a celebration of our culture, heritage, 
+                and identity. Each item in our collection is carefully selected to showcase the finest Indian 
+                craftsmanship, from intricate Banarasi weaves to delicate zardozi embroidery, making traditional 
+                elegance accessible for modern lifestyles.
               </p>
               <p className="text-lg leading-relaxed">
-                Our commitment to quality, sustainability, and exceptional customer service has helped us build a 
-                community of loyal customers who trust us to deliver pieces that elevate their wardrobe season 
-                after season.
+                Our commitment to authentic handloom fabrics, supporting local artisans, and exceptional customer 
+                service has helped us build a community of loyal patrons who trust us to deliver pieces that honor 
+                tradition while embracing contemporary aesthetics season after season.
               </p>
             </div>
           </div>
@@ -55,10 +57,10 @@ const About = () => {
                 <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                   <Heart className="h-8 w-8 text-accent" />
                 </div>
-                <h3 className="font-heading text-xl font-bold mb-3">Quality First</h3>
+                <h3 className="font-heading text-xl font-bold mb-3">Authentic Craftsmanship</h3>
                 <p className="text-muted-foreground">
-                  We source only the finest materials and work with trusted artisans to ensure every piece 
-                  meets our exacting standards of quality and craftsmanship.
+                  We source directly from master weavers and artisans across India, ensuring authentic handloom 
+                  fabrics and traditional embroidery techniques in every piece.
                 </p>
               </div>
 
@@ -66,10 +68,10 @@ const About = () => {
                 <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                   <Award className="h-8 w-8 text-accent" />
                 </div>
-                <h3 className="font-heading text-xl font-bold mb-3">Timeless Style</h3>
+                <h3 className="font-heading text-xl font-bold mb-3">Heritage & Tradition</h3>
                 <p className="text-muted-foreground">
-                  We curate collections that transcend fleeting trends, offering pieces that remain stylish 
-                  and relevant year after year.
+                  We curate collections that celebrate India's rich textile heritage, from timeless Banarasi silks 
+                  to contemporary fusion wear that honors tradition while embracing modernity.
                 </p>
               </div>
 
@@ -94,10 +96,10 @@ const About = () => {
               Our Mission
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed mb-8">
-              To empower individuals through fashion by offering carefully curated, high-quality pieces 
-              that inspire confidence and celebrate personal style. We're committed to providing an 
-              exceptional shopping experience while maintaining our dedication to sustainability and 
-              ethical practices.
+              To preserve and promote India's rich textile heritage by offering authentic, handcrafted ethnic 
+              wear that empowers individuals to celebrate their cultural roots with pride. We're committed to 
+              supporting local artisans, sustainable practices, and providing an exceptional shopping experience 
+              that honors tradition while embracing contemporary fashion.
             </p>
           </div>
         </section>
@@ -109,7 +111,7 @@ const About = () => {
               Join the JAANU Family
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Experience the difference of shopping with a boutique that truly cares about your style journey.
+              Experience the richness of Indian ethnic fashion with a boutique that celebrates tradition and craftsmanship.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="/shop">

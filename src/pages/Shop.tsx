@@ -14,33 +14,89 @@ import {
 } from "@/components/ui/select";
 import { SlidersHorizontal, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import product1 from "@/assets/product-1.jpg";
-import product2 from "@/assets/product-2.jpg";
-import product3 from "@/assets/product-3.jpg";
-import product4 from "@/assets/product-4.jpg";
+import saree1 from "@/assets/saree-1.jpg";
+import saree2 from "@/assets/saree-2.jpg";
+import lehenga1 from "@/assets/lehenga-1.jpg";
+import anarkali1 from "@/assets/anarkali-1.jpg";
+import kurti1 from "@/assets/kurti-1.jpg";
+import mensKurta1 from "@/assets/mens-kurta-1.jpg";
+import sherwani1 from "@/assets/sherwani-1.jpg";
+import potliBag from "@/assets/potli-bag.jpg";
+import jewelryEarrings from "@/assets/jewelry-earrings.jpg";
+import dupatta1 from "@/assets/dupatta-1.jpg";
+import kidsLehenga from "@/assets/kids-lehenga.jpg";
+import indoWesternGown from "@/assets/indo-western-gown.jpg";
 
 const Shop = () => {
-  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
 
   const allProducts = [
-    { id: 1, name: "Elegant Cream Dress", price: 189.99, image: product1, category: "Women's Wear", isNew: true },
-    { id: 2, name: "Blush Pink Blazer", price: 249.99, image: product2, category: "Women's Wear", discount: 20 },
-    { id: 3, name: "Gold Accessories Set", price: 129.99, image: product3, category: "Accessories", isNew: true },
-    { id: 4, name: "Charcoal Formal Suit", price: 399.99, image: product4, category: "Men's Wear" },
-    { id: 5, name: "Summer Floral Dress", price: 159.99, image: product1, category: "Women's Wear" },
-    { id: 6, name: "Classic Navy Blazer", price: 229.99, image: product2, category: "Women's Wear", discount: 15 },
-    { id: 7, name: "Designer Handbag", price: 299.99, image: product3, category: "Accessories", isNew: true },
-    { id: 8, name: "Premium Leather Shoes", price: 179.99, image: product4, category: "Accessories" },
+    // Ethnic Wear - Sarees
+    { id: 1, name: "Silk Saree with Zari Work", price: 4999, image: saree1, category: "Sarees", subcategory: "Ethnic Wear", isNew: true },
+    { id: 2, name: "Banarasi Silk Saree", price: 6999, image: saree2, category: "Sarees", subcategory: "Ethnic Wear", discount: 15 },
+    
+    // Ethnic Wear - Lehengas
+    { id: 3, name: "Bridal Lehenga Choli", price: 15999, image: lehenga1, category: "Lehengas", subcategory: "Bridal Wear", isNew: true },
+    { id: 4, name: "Party Wear Lehenga", price: 8999, image: lehenga1, category: "Lehengas", subcategory: "Ethnic Wear" },
+    
+    // Ethnic Wear - Salwar Suits
+    { id: 5, name: "Anarkali Suit Set", price: 3499, image: anarkali1, category: "Salwar Suits", subcategory: "Ethnic Wear", isNew: true },
+    { id: 6, name: "Punjabi Suit with Dupatta", price: 2999, image: anarkali1, category: "Salwar Suits", subcategory: "Ethnic Wear", discount: 10 },
+    
+    // Ethnic Wear - Kurtis
+    { id: 7, name: "Designer Kurti with Palazzo", price: 2499, image: kurti1, category: "Kurtis & Kurtas", subcategory: "Ethnic Wear" },
+    { id: 8, name: "Embroidered Cotton Kurti", price: 1499, image: kurti1, category: "Kurtis & Kurtas", subcategory: "Ethnic Wear", discount: 20 },
+    
+    // Men's Wear
+    { id: 9, name: "Men's Kurta Pajama Set", price: 2999, image: mensKurta1, category: "Men's Kurtas", subcategory: "Men's Ethnic Wear", isNew: true },
+    { id: 10, name: "Wedding Sherwani", price: 12999, image: sherwani1, category: "Sherwanis", subcategory: "Men's Bridal Wear" },
+    
+    // Accessories
+    { id: 11, name: "Embroidered Potli Bag", price: 799, image: potliBag, category: "Bags & Clutches", subcategory: "Accessories", isNew: true },
+    { id: 12, name: "Kundan Jhumka Earrings", price: 1299, image: jewelryEarrings, category: "Jewelry", subcategory: "Accessories", discount: 25 },
+    
+    // Dupattas
+    { id: 13, name: "Chiffon Dupatta with Embroidery", price: 899, image: dupatta1, category: "Dupattas & Stoles", subcategory: "Ethnic Wear" },
+    { id: 14, name: "Banarasi Dupatta", price: 1499, image: dupatta1, category: "Dupattas & Stoles", subcategory: "Ethnic Wear", isNew: true },
+    
+    // Kids Wear
+    { id: 15, name: "Girl's Lehenga Choli", price: 1999, image: kidsLehenga, category: "Kids Wear", subcategory: "Kids Ethnic Wear", isNew: true },
+    { id: 16, name: "Girl's Festive Dress", price: 1499, image: kidsLehenga, category: "Kids Wear", subcategory: "Kids Ethnic Wear", discount: 15 },
+    
+    // Indo-Western
+    { id: 17, name: "Indo-Western Gown", price: 5999, image: indoWesternGown, category: "Gowns", subcategory: "Indo-Western", isNew: true },
+    { id: 18, name: "Fusion Party Gown", price: 4999, image: indoWesternGown, category: "Gowns", subcategory: "Indo-Western", discount: 10 },
   ];
 
-  const categories = ["Women's Wear", "Men's Wear", "Accessories"];
-  const sizes = ["XS", "S", "M", "L", "XL"];
+  const categories = [
+    "Sarees",
+    "Lehengas", 
+    "Salwar Suits",
+    "Kurtis & Kurtas",
+    "Gowns",
+    "Dupattas & Stoles",
+    "Men's Kurtas",
+    "Sherwanis",
+    "Kids Wear",
+    "Jewelry",
+    "Bags & Clutches"
+  ];
+
+  const subcategories = [
+    "Ethnic Wear",
+    "Bridal Wear",
+    "Indo-Western",
+    "Men's Ethnic Wear",
+    "Men's Bridal Wear",
+    "Kids Ethnic Wear",
+    "Accessories"
+  ];
 
   const FilterSidebar = () => (
     <div className="space-y-6">
       <div>
         <h3 className="font-heading text-lg font-semibold mb-4">Categories</h3>
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
           {categories.map((category) => (
             <div key={category} className="flex items-center space-x-2">
               <Checkbox id={category} />
@@ -56,33 +112,34 @@ const Shop = () => {
       </div>
 
       <div>
-        <h3 className="font-heading text-lg font-semibold mb-4">Price Range</h3>
-        <Slider
-          value={priceRange}
-          onValueChange={setPriceRange}
-          max={500}
-          step={10}
-          className="mb-4"
-        />
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>${priceRange[0]}</span>
-          <span>${priceRange[1]}</span>
+        <h3 className="font-heading text-lg font-semibold mb-4">Collection</h3>
+        <div className="space-y-3">
+          {subcategories.map((subcategory) => (
+            <div key={subcategory} className="flex items-center space-x-2">
+              <Checkbox id={subcategory} />
+              <label
+                htmlFor={subcategory}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                {subcategory}
+              </label>
+            </div>
+          ))}
         </div>
       </div>
 
       <div>
-        <h3 className="font-heading text-lg font-semibold mb-4">Size</h3>
-        <div className="flex flex-wrap gap-2">
-          {sizes.map((size) => (
-            <Button
-              key={size}
-              variant="outline"
-              size="sm"
-              className="w-12 h-12 hover:border-accent hover:text-accent"
-            >
-              {size}
-            </Button>
-          ))}
+        <h3 className="font-heading text-lg font-semibold mb-4">Price Range</h3>
+        <Slider
+          value={priceRange}
+          onValueChange={setPriceRange}
+          max={20000}
+          step={500}
+          className="mb-4"
+        />
+        <div className="flex justify-between text-sm text-muted-foreground">
+          <span>₹{priceRange[0]}</span>
+          <span>₹{priceRange[1]}</span>
         </div>
       </div>
 
@@ -101,8 +158,8 @@ const Shop = () => {
         {/* Page Header */}
         <section className="bg-muted py-12">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">Shop All</h1>
-            <p className="text-muted-foreground">Discover our complete collection of curated fashion</p>
+            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">Shop All Collections</h1>
+            <p className="text-muted-foreground">Discover our exquisite range of ethnic and fusion wear</p>
           </div>
         </section>
 
@@ -124,7 +181,7 @@ const Shop = () => {
                       Filters
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="w-[300px]">
+                  <SheetContent side="left" className="w-[300px] overflow-y-auto">
                     <h2 className="font-heading text-xl font-bold mb-6">Filters</h2>
                     <FilterSidebar />
                   </SheetContent>
@@ -163,7 +220,7 @@ const Shop = () => {
                   ))}
                 </div>
 
-                {/* Pagination would go here */}
+                {/* Pagination */}
                 <div className="mt-12 flex justify-center">
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm">Previous</Button>
