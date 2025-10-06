@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, ShoppingBag, Heart, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,12 +8,20 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { SearchBar } from "./SearchBar";
+import { useSearch } from "@/hooks/useSearch";
+import { getPopularSearches } from "@/services/searchService";
 
 const Navigation = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [cartCount] = useState(0);
   const [wishlistCount] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Use search hook for global search functionality
+  const { query, setQuery, performSearch, suggestions, isSearching } = useSearch();
+  const popularSearches = getPopularSearches();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -23,6 +31,13 @@ const Navigation = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Handle search with navigation
+  const handleSearch = (searchQuery: string) => {
+    performSearch(searchQuery);
+    navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
+    setIsSearchOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -79,20 +94,16 @@ const Navigation = () => {
             {/* Search */}
             <div className="hidden sm:block">
               {isSearchOpen ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="w-[200px] transition-all"
-                    autoFocus
+                <div className="w-[300px]">
+                  <SearchBar
+                    query={query}
+                    onQueryChange={setQuery}
+                    onSearch={handleSearch}
+                    suggestions={suggestions}
+                    popularSearches={popularSearches}
+                    isSearching={isSearching}
+                    placeholder="Search sarees, lehengas, kurtas..."
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsSearchOpen(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
                 </div>
               ) : (
                 <Button
