@@ -37,6 +37,8 @@ const Navigation = () => {
     performSearch(searchQuery);
     navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
     setIsSearchOpen(false);
+    // Ensure scroll to top after navigation
+    setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
   };
 
   return (
