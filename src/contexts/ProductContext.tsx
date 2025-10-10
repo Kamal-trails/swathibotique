@@ -246,7 +246,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 // Custom hook to use product context
 export const useProducts = () => {
   const context = useContext(ProductContext);
+  console.log('useProducts called, context:', context);
   if (context === undefined) {
+    console.error('useProducts: Context is undefined - not within ProductProvider');
     throw new Error('useProducts must be used within a ProductProvider');
   }
   return context;
