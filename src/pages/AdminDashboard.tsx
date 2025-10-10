@@ -159,6 +159,13 @@ const AdminDashboard = () => {
                   </Button>
                 </Link>
                 
+                <Link to="/admin/inventory">
+                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
+                    <TrendingUp className="h-6 w-6" />
+                    Inventory
+                  </Button>
+                </Link>
+                
                 <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
                   <TrendingUp className="h-6 w-6" />
                   View Analytics

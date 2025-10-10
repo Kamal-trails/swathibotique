@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./contexts/CartContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
 import { ProductProvider } from "./contexts/ProductContextClean";
+import { InventoryProvider } from "./contexts/InventoryContext";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
@@ -21,6 +22,7 @@ import AdminEditProduct from "./pages/AdminEditProduct";
 import AdminManageProductsTest from "./pages/AdminManageProductsTest";
 import AdminManageProductsMinimal from "./pages/AdminManageProductsMinimal";
 import AdminManageProductsNoContext from "./pages/AdminManageProductsNoContext";
+import InventoryDashboard from "./pages/InventoryDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,8 +31,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ProductProvider>
-        <CartProvider>
-          <FavoritesProvider>
+        <InventoryProvider>
+          <CartProvider>
+            <FavoritesProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
@@ -52,12 +55,14 @@ const App = () => (
               <Route path="/admin/manage-products-minimal" element={<AdminManageProductsMinimal />} />
               <Route path="/admin/manage-products-no-context" element={<AdminManageProductsNoContext />} />
               <Route path="/admin/edit-product/:id" element={<AdminEditProduct />} />
+              <Route path="/admin/inventory" element={<InventoryDashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             </BrowserRouter>
-          </FavoritesProvider>
-        </CartProvider>
+            </FavoritesProvider>
+          </CartProvider>
+        </InventoryProvider>
       </ProductProvider>
     </TooltipProvider>
   </QueryClientProvider>

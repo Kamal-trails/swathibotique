@@ -24,6 +24,30 @@ export interface Product {
   sku?: string;
   careInstructions?: string;
   origin?: string;
+  
+  // Inventory Management Fields
+  inventory?: {
+    currentStock: number;
+    reservedStock: number;
+    availableStock: number;
+    minimumStock: number;
+    maximumStock: number;
+    reorderPoint: number;
+    reorderQuantity: number;
+    costPrice: number;
+    margin: number;
+    warehouse: string;
+    shelf: string;
+    bin: string;
+    lastRestocked: Date;
+    lastSold: Date;
+    totalSold: number;
+    totalRevenue: number;
+    averageMonthlySales: number;
+    turnoverRate: number;
+    status: 'active' | 'inactive' | 'discontinued';
+    notes: string;
+  };
 }
 
 export type ProductCategory = 

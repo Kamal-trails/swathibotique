@@ -65,6 +65,21 @@ interface ProductFormData {
   careInstructions: string;
   origin: string;
   sku: string;
+  
+  // Inventory Management Fields
+  inventory: {
+    currentStock: number;
+    minimumStock: number;
+    maximumStock: number;
+    reorderPoint: number;
+    reorderQuantity: number;
+    costPrice: number;
+    warehouse: string;
+    shelf: string;
+    bin: string;
+    status: 'active' | 'inactive' | 'discontinued';
+    notes: string;
+  };
 }
 
 const AdminAddProductClean = () => {
@@ -88,7 +103,22 @@ const AdminAddProductClean = () => {
     reviews: 0,
     careInstructions: '',
     origin: 'Made in India',
-    sku: ''
+    sku: '',
+    
+    // Inventory Management Fields
+    inventory: {
+      currentStock: 0,
+      minimumStock: 5,
+      maximumStock: 100,
+      reorderPoint: 10,
+      reorderQuantity: 20,
+      costPrice: 0,
+      warehouse: 'Main Warehouse',
+      shelf: 'A1',
+      bin: 'B1',
+      status: 'active',
+      notes: ''
+    }
   });
 
   const [images, setImages] = useState<File[]>([]);
@@ -153,6 +183,22 @@ const AdminAddProductClean = () => {
       return;
     }
 
+    // Validate inventory fields
+    if (formData.inventory.currentStock < 0 || formData.inventory.minimumStock < 0 || formData.inventory.maximumStock < 0) {
+      toast.error('Stock quantities cannot be negative');
+      return;
+    }
+
+    if (formData.inventory.minimumStock > formData.inventory.maximumStock) {
+      toast.error('Minimum stock cannot be greater than maximum stock');
+      return;
+    }
+
+    if (formData.inventory.costPrice < 0) {
+      toast.error('Cost price cannot be negative');
+      return;
+    }
+
     if (images.length === 0) {
       toast.error('Please upload at least one product image');
       return;
@@ -160,7 +206,68 @@ const AdminAddProductClean = () => {
 
     try {
       setIsSubmitting(true);
-      await addProduct(formData, images);
+      
+      // Convert images to base64
+      const imagePromises = images.map(file => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error('Failed to read file'));
+          reader.readAsDataURL(file);
+        });
+      });
+
+      const imageUrls = await Promise.all(imagePromises);
+      
+      // Create new product with inventory data
+      const newProduct = {
+        id: Date.now(), // Simple ID generation
+        name: formData.name,
+        price: formData.price,
+        image: imageUrls[0] || '/placeholder.svg',
+        images: imageUrls,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        description: formData.description,
+        fabric: formData.fabric,
+        occasion: formData.occasion || [],
+        colors: formData.colors || [],
+        sizes: formData.sizes || [],
+        isNew: formData.isNew || false,
+        discount: formData.discount || 0,
+        inStock: formData.inStock !== false,
+        rating: formData.rating || 4.0,
+        reviews: formData.reviews || 0,
+        careInstructions: formData.careInstructions || '',
+        origin: formData.origin || 'Made in India',
+        sku: formData.sku || `JB-${Date.now()}`,
+        
+        // Include inventory data
+        inventory: {
+          currentStock: formData.inventory.currentStock,
+          reservedStock: 0,
+          availableStock: formData.inventory.currentStock,
+          minimumStock: formData.inventory.minimumStock,
+          maximumStock: formData.inventory.maximumStock,
+          reorderPoint: formData.inventory.reorderPoint,
+          reorderQuantity: formData.inventory.reorderQuantity,
+          costPrice: formData.inventory.costPrice,
+          margin: formData.price - formData.inventory.costPrice,
+          warehouse: formData.inventory.warehouse,
+          shelf: formData.inventory.shelf,
+          bin: formData.inventory.bin,
+          lastRestocked: new Date(),
+          lastSold: new Date(),
+          totalSold: 0,
+          totalRevenue: 0,
+          averageMonthlySales: 0,
+          turnoverRate: 0,
+          status: formData.inventory.status,
+          notes: formData.inventory.notes
+        }
+      };
+
+      await addProduct(newProduct, images);
       
       toast.success(`Product "${formData.name}" added successfully!`);
       navigate('/admin/manage-products');
@@ -354,6 +461,154 @@ const AdminAddProductClean = () => {
                         />
                         <Label htmlFor="inStock">In Stock</Label>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Inventory Management Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Inventory Management</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="currentStock">Current Stock</Label>
+                        <Input
+                          id="currentStock"
+                          type="number"
+                          value={formData.inventory.currentStock}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, currentStock: Number(e.target.value) })}
+                          placeholder="Enter current stock quantity"
+                          min="0"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="costPrice">Cost Price (₹)</Label>
+                        <Input
+                          id="costPrice"
+                          type="number"
+                          value={formData.inventory.costPrice}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, costPrice: Number(e.target.value) })}
+                          placeholder="Enter cost price"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="minimumStock">Minimum Stock</Label>
+                        <Input
+                          id="minimumStock"
+                          type="number"
+                          value={formData.inventory.minimumStock}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, minimumStock: Number(e.target.value) })}
+                          placeholder="Min stock level"
+                          min="0"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="maximumStock">Maximum Stock</Label>
+                        <Input
+                          id="maximumStock"
+                          type="number"
+                          value={formData.inventory.maximumStock}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, maximumStock: Number(e.target.value) })}
+                          placeholder="Max stock level"
+                          min="0"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="reorderPoint">Reorder Point</Label>
+                        <Input
+                          id="reorderPoint"
+                          type="number"
+                          value={formData.inventory.reorderPoint}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, reorderPoint: Number(e.target.value) })}
+                          placeholder="Reorder threshold"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="reorderQuantity">Reorder Quantity</Label>
+                        <Input
+                          id="reorderQuantity"
+                          type="number"
+                          value={formData.inventory.reorderQuantity}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, reorderQuantity: Number(e.target.value) })}
+                          placeholder="Reorder amount"
+                          min="0"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="warehouse">Warehouse</Label>
+                        <Input
+                          id="warehouse"
+                          value={formData.inventory.warehouse}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, warehouse: e.target.value })}
+                          placeholder="Warehouse location"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="shelf">Shelf</Label>
+                        <Input
+                          id="shelf"
+                          value={formData.inventory.shelf}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, shelf: e.target.value })}
+                          placeholder="Shelf location"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="bin">Bin</Label>
+                        <Input
+                          id="bin"
+                          value={formData.inventory.bin}
+                          onChange={(e) => handleInputChange('inventory', { ...formData.inventory, bin: e.target.value })}
+                          placeholder="Bin location"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="inventoryStatus">Status</Label>
+                        <Select 
+                          value={formData.inventory.status} 
+                          onValueChange={(value: 'active' | 'inactive' | 'discontinued') => 
+                            handleInputChange('inventory', { ...formData.inventory, status: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                            <SelectItem value="discontinued">Discontinued</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="inventoryNotes">Inventory Notes</Label>
+                      <Textarea
+                        id="inventoryNotes"
+                        value={formData.inventory.notes}
+                        onChange={(e) => handleInputChange('inventory', { ...formData.inventory, notes: e.target.value })}
+                        placeholder="Additional inventory notes (optional)"
+                        rows={3}
+                      />
                     </div>
                   </CardContent>
                 </Card>
