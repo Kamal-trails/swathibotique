@@ -67,7 +67,7 @@ const COMMON_SIZES = [
 const AdminEditProduct = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getProducts, updateProduct } = useProducts();
+  const { getProducts, getAdminProducts, updateProduct } = useProducts();
   const allProducts = getProducts();
   
   const [formData, setFormData] = useState<ProductFormData>({
@@ -96,8 +96,10 @@ const AdminEditProduct = () => {
   const [customSize, setCustomSize] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Find the product to edit
-  const productToEdit = allProducts.find(p => p.id === parseInt(id || '0'));
+  // Find the product to edit - check both admin products and regular products
+  const adminProducts = getAdminProducts();
+  const productToEdit = adminProducts.find(p => p.id === parseInt(id || '0')) || 
+                       allProducts.find(p => p.id === parseInt(id || '0'));
 
   // Load product data on mount
   useEffect(() => {

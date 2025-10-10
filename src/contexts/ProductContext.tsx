@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Product } from '@/types/product';
 import { AdminProduct } from '@/services/adminService';
 import { formDataToProduct } from '@/services/adminService';
+import { getAllProducts } from '@/services/productService';
 
 // Product State interface
 interface ProductState {
@@ -151,11 +152,12 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Load initial products from service
   useEffect(() => {
-    // Import here to avoid circular dependency
-    import('@/services/productService').then(({ getAllProducts }) => {
+    try {
       const initialProducts = getAllProducts();
       dispatch({ type: 'LOAD_PRODUCTS', payload: initialProducts });
-    });
+    } catch (error) {
+      console.error('Error loading initial products:', error);
+    }
   }, []);
 
   // Load admin products from localStorage on mount
@@ -167,6 +169,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         dispatch({ type: 'LOAD_ADMIN_PRODUCTS', payload: adminProducts });
       } catch (error) {
         console.error('Error loading admin products from localStorage:', error);
+        // Clear corrupted data
+        localStorage.removeItem('adminProducts');
       }
     }
   }, []);
@@ -179,19 +183,28 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [state.adminProducts]);
 
   const addProduct = (productData: any, images: File[]) => {
-    // Convert File objects to base64 strings for storage
-    const imagePromises = images.map(file => {
-      return new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.readAsDataURL(file);
+    try {
+      // Convert File objects to base64 strings for storage
+      const imagePromises = images.map(file => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error('Failed to read file'));
+          reader.readAsDataURL(file);
+        });
       });
-    });
 
-    Promise.all(imagePromises).then(imageUrls => {
-      const newProduct = formDataToProduct(productData, imageUrls);
-      dispatch({ type: 'ADD_PRODUCT', payload: newProduct });
-    });
+      Promise.all(imagePromises).then(imageUrls => {
+        const newProduct = formDataToProduct(productData, imageUrls);
+        dispatch({ type: 'ADD_PRODUCT', payload: newProduct });
+      }).catch(error => {
+        console.error('Error processing images:', error);
+        throw error;
+      });
+    } catch (error) {
+      console.error('Error adding product:', error);
+      throw error;
+    }
   };
 
   const updateProduct = (id: number, updates: Partial<AdminProduct>) => {

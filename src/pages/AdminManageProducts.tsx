@@ -42,6 +42,25 @@ const AdminManageProducts = () => {
   const allProducts = getProducts();
   const adminProducts = getAdminProducts();
   
+  // Use adminProducts for management, fallback to allProducts if adminProducts is empty
+  const productsToManage = adminProducts && adminProducts.length > 0 ? adminProducts : (allProducts || []);
+  
+  // Show loading state if no products are available yet
+  if (!allProducts || allProducts.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navigation />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+            <p>Loading products...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
   const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set());
   const [filters, setFilters] = useState<ProductFilters>({
     search: '',
@@ -57,68 +76,68 @@ const AdminManageProducts = () => {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let filtered = allProducts;
+    let filtered = productsToManage;
 
     // Apply search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm) ||
-        product.category.toLowerCase().includes(searchTerm) ||
-        product.subcategory.toLowerCase().includes(searchTerm) ||
-        product.sku?.toLowerCase().includes(searchTerm)
+        product?.name?.toLowerCase().includes(searchTerm) ||
+        product?.category?.toLowerCase().includes(searchTerm) ||
+        product?.subcategory?.toLowerCase().includes(searchTerm) ||
+        product?.sku?.toLowerCase().includes(searchTerm)
       );
     }
 
     // Apply category filter
     if (filters.category) {
-      filtered = filtered.filter(product => product.category === filters.category);
+      filtered = filtered.filter(product => product?.category === filters.category);
     }
 
     // Apply stock filter
     if (filters.inStock) {
       const inStock = filters.inStock === 'true';
-      filtered = filtered.filter(product => product.inStock === inStock);
+      filtered = filtered.filter(product => product?.inStock === inStock);
     }
 
     // Apply new filter
     if (filters.isNew) {
       const isNew = filters.isNew === 'true';
-      filtered = filtered.filter(product => product.isNew === isNew);
+      filtered = filtered.filter(product => product?.isNew === isNew);
     }
 
     // Apply sorting
     switch (sortBy) {
       case 'newest':
-        filtered.sort((a, b) => b.id - a.id);
+        filtered.sort((a, b) => (b?.id || 0) - (a?.id || 0));
         break;
       case 'oldest':
-        filtered.sort((a, b) => a.id - b.id);
+        filtered.sort((a, b) => (a?.id || 0) - (b?.id || 0));
         break;
       case 'name-asc':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => (a?.name || '').localeCompare(b?.name || ''));
         break;
       case 'name-desc':
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        filtered.sort((a, b) => (b?.name || '').localeCompare(a?.name || ''));
         break;
       case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price);
+        filtered.sort((a, b) => (a?.price || 0) - (b?.price || 0));
         break;
       case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
+        filtered.sort((a, b) => (b?.price || 0) - (a?.price || 0));
         break;
       case 'rating-desc':
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        filtered.sort((a, b) => (b?.rating || 0) - (a?.rating || 0));
         break;
     }
 
     return filtered;
-  }, [allProducts, filters, sortBy]);
+  }, [productsToManage, filters, sortBy]);
 
   // Get unique categories
   const categories = useMemo(() => {
-    return [...new Set(allProducts.map(p => p.category))].sort();
-  }, [allProducts]);
+    return [...new Set(productsToManage.map(p => p?.category).filter(Boolean))].sort();
+  }, [productsToManage]);
 
   // Handle product selection
   const toggleProductSelection = (productId: number) => {
@@ -136,15 +155,17 @@ const AdminManageProducts = () => {
     if (selectedProducts.size === filteredProducts.length) {
       setSelectedProducts(new Set());
     } else {
-      setSelectedProducts(new Set(filteredProducts.map(p => p.id)));
+      setSelectedProducts(new Set(filteredProducts.map(p => p?.id).filter(Boolean)));
     }
   };
 
   // Handle delete single product
   const handleDeleteProduct = (product: any) => {
-    deleteProduct(product.id);
-    toast.success(`Product "${product.name}" deleted successfully`);
-    setDeleteDialog({ open: false, product: null });
+    if (product?.id) {
+      deleteProduct(product.id);
+      toast.success(`Product "${product?.name || 'Product'}" deleted successfully`);
+      setDeleteDialog({ open: false, product: null });
+    }
   };
 
   // Handle bulk delete
@@ -159,21 +180,25 @@ const AdminManageProducts = () => {
 
   // Handle toggle stock status
   const toggleStockStatus = (product: any) => {
-    updateProduct(product.id, { inStock: !product.inStock });
-    toast.success(`Stock status updated for "${product.name}"`);
+    if (product?.id) {
+      updateProduct(product.id, { inStock: !product.inStock });
+      toast.success(`Stock status updated for "${product?.name || 'Product'}"`);
+    }
   };
 
   // Handle toggle new status
   const toggleNewStatus = (product: any) => {
-    updateProduct(product.id, { isNew: !product.isNew });
-    toast.success(`New status updated for "${product.name}"`);
+    if (product?.id) {
+      updateProduct(product.id, { isNew: !product.isNew });
+      toast.success(`New status updated for "${product?.name || 'Product'}"`);
+    }
   };
 
   // Get product status badge
   const getStatusBadge = (product: any) => {
-    if (!product.inStock) return <Badge variant="destructive">Out of Stock</Badge>;
-    if (product.isNew) return <Badge variant="default">New</Badge>;
-    if (product.discount && product.discount > 0) return <Badge variant="secondary">{product.discount}% Off</Badge>;
+    if (!product?.inStock) return <Badge variant="destructive">Out of Stock</Badge>;
+    if (product?.isNew) return <Badge variant="default">New</Badge>;
+    if (product?.discount && product.discount > 0) return <Badge variant="secondary">{product.discount}% Off</Badge>;
     return <Badge variant="outline">Active</Badge>;
   };
 
@@ -355,47 +380,47 @@ const AdminManageProducts = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredProducts.map((product) => (
-                        <TableRow key={product.id}>
+                        <TableRow key={product?.id || Math.random()}>
                           <TableCell>
                             <Checkbox
-                              checked={selectedProducts.has(product.id)}
-                              onCheckedChange={() => toggleProductSelection(product.id)}
+                              checked={selectedProducts.has(product?.id || 0)}
+                              onCheckedChange={() => toggleProductSelection(product?.id || 0)}
                             />
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <img
-                                src={product.image}
-                                alt={product.name}
+                                src={product?.image || '/placeholder.svg'}
+                                alt={product?.name || 'Product'}
                                 className="w-12 h-12 object-cover rounded-lg"
                               />
                               <div>
-                                <div className="font-medium">{product.name}</div>
+                                <div className="font-medium">{product?.name || 'Unnamed Product'}</div>
                                 <div className="text-sm text-muted-foreground">
-                                  SKU: {product.sku || 'N/A'}
+                                  SKU: {product?.sku || 'N/A'}
                                 </div>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div>
-                              <div className="font-medium">{product.category}</div>
-                              <div className="text-sm text-muted-foreground">{product.subcategory}</div>
+                              <div className="font-medium">{product?.category || 'Uncategorized'}</div>
+                              <div className="text-sm text-muted-foreground">{product?.subcategory || 'No subcategory'}</div>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div>
-                              {product.discount && product.discount > 0 ? (
+                              {product?.discount && product.discount > 0 ? (
                                 <>
                                   <div className="font-medium text-accent">
-                                    ₹{Math.round(product.price * (1 - product.discount / 100))}
+                                    ₹{Math.round((product?.price || 0) * (1 - product.discount / 100))}
                                   </div>
                                   <div className="text-sm text-muted-foreground line-through">
-                                    ₹{product.price}
+                                    ₹{product?.price || 0}
                                   </div>
                                 </>
                               ) : (
-                                <div className="font-medium">₹{product.price}</div>
+                                <div className="font-medium">₹{product?.price || 0}</div>
                               )}
                             </div>
                           </TableCell>
@@ -403,19 +428,19 @@ const AdminManageProducts = () => {
                           <TableCell>
                             <div className="flex items-center gap-1">
                               <span>⭐</span>
-                              <span>{product.rating?.toFixed(1) || 'N/A'}</span>
+                              <span>{product?.rating?.toFixed(1) || 'N/A'}</span>
                               <span className="text-muted-foreground">
-                                ({product.reviews || 0})
+                                ({product?.reviews || 0})
                               </span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <Button
-                              variant={product.inStock ? "default" : "destructive"}
+                              variant={product?.inStock ? "default" : "destructive"}
                               size="sm"
                               onClick={() => toggleStockStatus(product)}
                             >
-                              {product.inStock ? (
+                              {product?.inStock ? (
                                 <CheckCircle className="h-4 w-4" />
                               ) : (
                                 <XCircle className="h-4 w-4" />
@@ -548,9 +573,14 @@ const AdminManageProducts = () => {
               {filteredProducts.length === 0 && (
                 <div className="text-center py-12">
                   <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No products found</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {productsToManage.length === 0 ? 'No products available' : 'No products found'}
+                  </h3>
                   <p className="text-muted-foreground mb-4">
-                    Try adjusting your filters or add a new product.
+                    {productsToManage.length === 0 
+                      ? 'Start by adding your first product to the catalog.'
+                      : 'Try adjusting your filters or add a new product.'
+                    }
                   </p>
                   <Link to="/admin/add-product">
                     <Button className="btn-gold">

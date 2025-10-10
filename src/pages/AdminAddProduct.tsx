@@ -217,7 +217,13 @@ const AdminAddProduct = () => {
     }
 
     // Add product using the context
-    addProduct(formData, images);
+    try {
+      addProduct(formData, images);
+    } catch (error) {
+      console.error('Error adding product:', error);
+      toast.error('Failed to add product. Please try again.');
+      return;
+    }
     
     // Show success message
     toast.success(`Product "${formData.name}" added successfully!`, {
