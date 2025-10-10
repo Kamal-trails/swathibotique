@@ -6,13 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { useProducts } from '@/contexts/ProductContext';
-import { getAllProducts } from '@/services/productService';
+import { useProducts } from '@/contexts/ProductContextClean';
 
 const AdminDashboard = () => {
-  const { getProducts, getAdminProducts } = useProducts();
-  const allProducts = getProducts();
-  const adminProducts = getAdminProducts();
+  const { products, isLoading, error } = useProducts();
+  const allProducts = products;
   
   // Real-time statistics
   const stats = {
@@ -22,8 +20,43 @@ const AdminDashboard = () => {
     totalRevenue: 2450000, // Mock data - would come from orders
     outOfStock: allProducts.filter(p => !p.inStock).length,
     highRated: allProducts.filter(p => (p.rating || 0) >= 4.5).length,
-    adminAdded: adminProducts.length
+    adminAdded: allProducts.filter(p => p.id > 1000).length // Admin products have higher IDs
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navigation />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+            <p>Loading dashboard...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navigation />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">Error Loading Dashboard</h2>
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Retry
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

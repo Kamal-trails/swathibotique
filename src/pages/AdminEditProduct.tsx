@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { useProducts } from '@/contexts/ProductContext';
+import { useProducts } from '@/contexts/ProductContextClean';
 import { toast } from 'sonner';
 import { Product, ProductCategory, ProductSubcategory, Occasion, Fabric } from '@/types/product';
 
@@ -67,8 +67,8 @@ const COMMON_SIZES = [
 const AdminEditProduct = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getProducts, getAdminProducts, updateProduct } = useProducts();
-  const allProducts = getProducts();
+  const { products, updateProduct } = useProducts();
+  const allProducts = products;
   
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
