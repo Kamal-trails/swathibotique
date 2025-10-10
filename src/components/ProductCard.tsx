@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Heart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
@@ -11,12 +11,19 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const navigate = useNavigate();
   const { addToCart, isInCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   
   const { id, name, price, image, category, isNew, discount } = product;
   const discountedPrice = discount ? price - (price * discount) / 100 : null;
   const isInFavorites = isFavorite(id);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart(product);
+    navigate('/cart');
+  };
 
   return (
     <div className="card-product group">
@@ -68,10 +75,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     size="icon"
                     variant="secondary"
                     className="rounded-full opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 hover:scale-110"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      addToCart(product);
-                    }}
+                    onClick={handleAddToCart}
                   >
                     <ShoppingBag className="h-5 w-5 transition-all duration-300" />
                   </Button>

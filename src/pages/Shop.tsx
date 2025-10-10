@@ -46,6 +46,7 @@ const Shop = () => {
     query,
     setQuery,
     performSearch,
+    searchResults,
     filteredProducts,
     filters,
     setFilters,
