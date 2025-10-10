@@ -1,21 +1,21 @@
 import { Link } from "react-router-dom";
 import { Heart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useCart } from "@/contexts/CartContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { Product } from "@/types/product";
 
 interface ProductCardProps {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  isNew?: boolean;
-  discount?: number;
+  product: Product;
 }
 
-const ProductCard = ({ id, name, price, image, category, isNew, discount }: ProductCardProps) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+const ProductCard = ({ product }: ProductCardProps) => {
+  const { addToCart, isInCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  
+  const { id, name, price, image, category, isNew, discount } = product;
   const discountedPrice = discount ? price - (price * discount) / 100 : null;
+  const isInFavorites = isFavorite(id);
 
   return (
     <div className="card-product group">
@@ -45,10 +45,10 @@ const ProductCard = ({ id, name, price, image, category, isNew, discount }: Prod
               className="rounded-full opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300"
               onClick={(e) => {
                 e.preventDefault();
-                setIsWishlisted(!isWishlisted);
+                toggleFavorite(product);
               }}
             >
-              <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-accent text-accent' : ''}`} />
+              <Heart className={`h-5 w-5 ${isInFavorites ? 'fill-accent text-accent' : ''}`} />
             </Button>
             <Button
               size="icon"
@@ -56,7 +56,7 @@ const ProductCard = ({ id, name, price, image, category, isNew, discount }: Prod
               className="rounded-full opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75"
               onClick={(e) => {
                 e.preventDefault();
-                // Add to cart logic
+                addToCart(product);
               }}
             >
               <ShoppingBag className="h-5 w-5" />

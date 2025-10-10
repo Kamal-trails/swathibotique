@@ -5,31 +5,24 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, ArrowRight, ShoppingBag } from "lucide-react";
-import product1 from "@/assets/product-1.jpg";
-import product2 from "@/assets/product-2.jpg";
+import { useCart } from "@/contexts/CartContext";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Elegant Cream Dress", price: 189.99, image: product1, size: "M", quantity: 1 },
-    { id: 2, name: "Blush Pink Blazer", price: 249.99, image: product2, size: "L", quantity: 1 },
-  ]);
-
+  const { state: cartState, updateQuantity, removeFromCart } = useCart();
   const [couponCode, setCouponCode] = useState("");
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartItems = cartState.items;
+  const subtotal = cartState.totalPrice;
   const shipping = subtotal > 100 ? 0 : 10;
   const total = subtotal + shipping;
+
+  const handleUpdateQuantity = (id: number, newQuantity: number) => {
+    updateQuantity(id, newQuantity);
+  };
+
+  const handleRemoveItem = (id: number) => {
+    removeFromCart(id);
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -96,7 +89,7 @@ const Cart = () => {
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                         >
                           -
                         </Button>
@@ -105,7 +98,7 @@ const Cart = () => {
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                         >
                           +
                         </Button>
@@ -114,7 +107,7 @@ const Cart = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => handleRemoveItem(item.id)}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />

@@ -11,13 +11,17 @@ import {
 import { SearchBar } from "./SearchBar";
 import { useSearch } from "@/hooks/useSearch";
 import { getPopularSearches } from "@/services/searchService";
+import { useCart } from "@/contexts/CartContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 const Navigation = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [cartCount] = useState(0);
-  const [wishlistCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Use cart and favorites contexts
+  const { state: cartState } = useCart();
+  const { state: favoritesState } = useFavorites();
   
   // Use search hook for global search functionality
   const { query, setQuery, performSearch, suggestions, isSearching } = useSearch();
@@ -132,9 +136,9 @@ const Navigation = () => {
             <Link to="/wishlist">
               <Button variant="ghost" size="icon" className="relative">
                 <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
+                {favoritesState.count > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-accent text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                    {wishlistCount}
+                    {favoritesState.count}
                   </span>
                 )}
               </Button>
@@ -144,9 +148,9 @@ const Navigation = () => {
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingBag className="h-5 w-5" />
-                {cartCount > 0 && (
+                {cartState.totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-accent text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                    {cartCount}
+                    {cartState.totalItems}
                   </span>
                 )}
               </Button>
