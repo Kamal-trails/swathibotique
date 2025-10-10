@@ -85,43 +85,102 @@ const processSearchTerm = (query: string): string[] => {
   return [...new Set(processedTerms)];
 };
 
-// Calculate relevance score
+// Calculate relevance score with advanced elastic search-like scoring
 const calculateScore = (
   product: Product, 
   searchTerms: string[], 
   matchedFields: string[]
 ): number => {
   let score = 0;
+  
+  // Field weights (higher = more important)
   const fieldWeights = {
-    name: 10,
-    category: 8,
-    subcategory: 6,
-    description: 4,
-    fabric: 3,
-    occasion: 3,
-    colors: 2,
-    sku: 1
+    name: 20,           // Product name is most important
+    category: 15,       // Category is very important
+    subcategory: 12,    // Subcategory is important
+    description: 8,     // Description is moderately important
+    fabric: 6,          // Fabric is somewhat important
+    occasion: 5,        // Occasion is somewhat important
+    colors: 3,          // Colors are less important
+    sku: 2             // SKU is least important
   };
   
+  // Calculate base score from matched fields
   matchedFields.forEach(field => {
     const weight = fieldWeights[field as keyof typeof fieldWeights] || 1;
     score += weight;
   });
   
-  // Boost score for exact matches
+  // Advanced scoring based on match quality
   searchTerms.forEach(term => {
-    if (product.name.toLowerCase().includes(term)) {
-      score += 5;
+    const termLower = term.toLowerCase();
+    
+    // Exact match in name (highest priority)
+    if (product.name.toLowerCase() === termLower) {
+      score += 50; // Very high boost for exact name match
+    } else if (product.name.toLowerCase().startsWith(termLower)) {
+      score += 30; // High boost for name starting with term
+    } else if (product.name.toLowerCase().includes(termLower)) {
+      score += 20; // Good boost for name containing term
     }
-    if (product.category.toLowerCase().includes(term)) {
-      score += 3;
+    
+    // Exact match in category
+    if (product.category.toLowerCase() === termLower) {
+      score += 25; // High boost for exact category match
+    } else if (product.category.toLowerCase().includes(termLower)) {
+      score += 15; // Good boost for category containing term
+    }
+    
+    // Exact match in subcategory
+    if (product.subcategory.toLowerCase() === termLower) {
+      score += 20; // Good boost for exact subcategory match
+    } else if (product.subcategory.toLowerCase().includes(termLower)) {
+      score += 10; // Moderate boost for subcategory containing term
+    }
+    
+    // Word boundary matches (more precise)
+    const nameWords = product.name.toLowerCase().split(/\s+/);
+    if (nameWords.some(word => word.startsWith(termLower))) {
+      score += 15; // Boost for word boundary match in name
+    }
+    
+    // Description matches
+    if (product.description?.toLowerCase().includes(termLower)) {
+      score += 8; // Moderate boost for description match
+    }
+    
+    // Fabric matches
+    if (product.fabric?.toLowerCase() === termLower) {
+      score += 12; // Good boost for exact fabric match
+    } else if (product.fabric?.toLowerCase().includes(termLower)) {
+      score += 6; // Moderate boost for fabric containing term
+    }
+    
+    // Occasion matches
+    if (product.occasion?.some(occ => occ.toLowerCase() === termLower)) {
+      score += 10; // Good boost for exact occasion match
+    } else if (product.occasion?.some(occ => occ.toLowerCase().includes(termLower))) {
+      score += 5; // Moderate boost for occasion containing term
+    }
+    
+    // Color matches
+    if (product.colors?.some(color => color.toLowerCase() === termLower)) {
+      score += 8; // Good boost for exact color match
+    } else if (product.colors?.some(color => color.toLowerCase().includes(termLower))) {
+      score += 4; // Moderate boost for color containing term
     }
   });
   
-  // Boost score for new items and high ratings
-  if (product.isNew) score += 2;
-  if (product.rating && product.rating >= 4.5) score += 2;
-  if (product.discount && product.discount > 0) score += 1;
+  // Boost factors for product quality and popularity
+  if (product.isNew) score += 5; // New items get a boost
+  if (product.rating && product.rating >= 4.5) score += 8; // High-rated items get boost
+  if (product.rating && product.rating >= 4.0) score += 4; // Good-rated items get smaller boost
+  if (product.discount && product.discount > 0) score += 3; // Discounted items get boost
+  if (product.reviews && product.reviews > 100) score += 2; // Popular items get boost
+  if (product.inStock) score += 2; // In-stock items get boost
+  
+  // Penalize out-of-stock items
+  if (!product.inStock) score *= 0.5;
   
   return score;
 };
@@ -145,17 +204,47 @@ const generateHighlights = (product: Product, searchTerms: string[]): string[] =
   return highlights.slice(0, 3); // Limit to 3 highlights
 };
 
-// Fuzzy string matching (Levenshtein distance)
-const fuzzyMatch = (str1: string, str2: string, threshold: number = 0.8): boolean => {
+// Advanced fuzzy string matching with multiple algorithms
+const fuzzyMatch = (str1: string, str2: string, threshold: number = 0.7): boolean => {
+  const s1 = str1.toLowerCase().trim();
+  const s2 = str2.toLowerCase().trim();
+  
+  if (s1 === s2) return true; // Exact match
+  
+  // Check for substring matches first (faster)
+  if (s1.includes(s2) || s2.includes(s1)) return true;
+  
+  // Check for word-level matches
+  const words1 = s1.split(/\s+/);
+  const words2 = s2.split(/\s+/);
+  
+  // If any word from search term matches any word in product text
+  for (const word1 of words1) {
+    for (const word2 of words2) {
+      if (word1 === word2) return true;
+      if (word1.includes(word2) || word2.includes(word1)) return true;
+      if (word1.length >= 3 && word2.length >= 3 && 
+          levenshteinSimilarity(word1, word2) >= threshold) return true;
+    }
+  }
+  
+  // Full string fuzzy matching for shorter strings
+  if (s1.length <= 20 && s2.length <= 20) {
+    return levenshteinSimilarity(s1, s2) >= threshold;
+  }
+  
+  return false;
+};
+
+// Calculate similarity ratio (0-1) using Levenshtein distance
+const levenshteinSimilarity = (str1: string, str2: string): number => {
   const longer = str1.length > str2.length ? str1 : str2;
   const shorter = str1.length > str2.length ? str2 : str1;
   
   if (longer.length === 0) return true;
   
   const distance = levenshteinDistance(longer, shorter);
-  const similarity = (longer.length - distance) / longer.length;
-  
-  return similarity >= threshold;
+  return (longer.length - distance) / longer.length;
 };
 
 // Levenshtein distance calculation
@@ -179,7 +268,7 @@ const levenshteinDistance = (str1: string, str2: string): number => {
   return matrix[str2.length][str1.length];
 };
 
-// Main search function
+// Enhanced search function with better matching logic
 export const searchProducts = (
   products: Product[], 
   query: string, 
@@ -203,64 +292,75 @@ export const searchProducts = (
     const matchedFields: string[] = [];
     let hasMatch = false;
     
-    // Check each search term against product fields
+    // Check each search term against product fields with improved matching
     searchTerms.forEach(term => {
-      // Name matching
-      if (product.name.toLowerCase().includes(term)) {
+      const termLower = term.toLowerCase();
+      
+      // Exact and partial name matching
+      if (product.name.toLowerCase().includes(termLower) || 
+          fuzzyMatch(product.name, term)) {
         matchedFields.push("name");
         hasMatch = true;
       }
       
-      // Description matching
-      if (product.description?.toLowerCase().includes(term)) {
+      // Description matching with fuzzy support
+      if (product.description && 
+          (product.description.toLowerCase().includes(termLower) ||
+           fuzzyMatch(product.description, term))) {
         matchedFields.push("description");
         hasMatch = true;
       }
       
       // Category matching
-      if (product.category.toLowerCase().includes(term)) {
+      if (product.category.toLowerCase().includes(termLower) ||
+          fuzzyMatch(product.category, term)) {
         matchedFields.push("category");
         hasMatch = true;
       }
       
       // Subcategory matching
-      if (product.subcategory.toLowerCase().includes(term)) {
+      if (product.subcategory.toLowerCase().includes(termLower) ||
+          fuzzyMatch(product.subcategory, term)) {
         matchedFields.push("subcategory");
         hasMatch = true;
       }
       
       // Fabric matching
-      if (product.fabric?.toLowerCase().includes(term)) {
+      if (product.fabric && 
+          (product.fabric.toLowerCase().includes(termLower) ||
+           fuzzyMatch(product.fabric, term))) {
         matchedFields.push("fabric");
         hasMatch = true;
       }
       
       // Occasion matching
-      if (product.occasion?.some(occ => occ.toLowerCase().includes(term))) {
+      if (product.occasion?.some(occ => 
+          occ.toLowerCase().includes(termLower) ||
+          fuzzyMatch(occ, term))) {
         matchedFields.push("occasion");
         hasMatch = true;
       }
       
       // Color matching
-      if (product.colors?.some(color => color.toLowerCase().includes(term))) {
+      if (product.colors?.some(color => 
+          color.toLowerCase().includes(termLower) ||
+          fuzzyMatch(color, term))) {
         matchedFields.push("colors");
         hasMatch = true;
       }
       
-      // SKU matching
-      if (product.sku?.toLowerCase().includes(term)) {
+      // SKU matching (exact only)
+      if (product.sku?.toLowerCase().includes(termLower)) {
         matchedFields.push("sku");
         hasMatch = true;
       }
       
-      // Fuzzy matching if enabled
-      if (searchConfig.fuzzyMatch) {
-        if (fuzzyMatch(product.name.toLowerCase(), term)) {
+      // Multi-word phrase matching
+      if (searchTerms.length > 1) {
+        const phrase = searchTerms.join(' ');
+        if (product.name.toLowerCase().includes(phrase) ||
+            product.description?.toLowerCase().includes(phrase)) {
           matchedFields.push("name");
-          hasMatch = true;
-        }
-        if (product.description && fuzzyMatch(product.description.toLowerCase(), term)) {
-          matchedFields.push("description");
           hasMatch = true;
         }
       }
@@ -283,54 +383,95 @@ export const searchProducts = (
   
   // Sort by relevance score and limit results
   return results
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => {
+      // Primary sort by score
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      
+      // Secondary sort by rating for same scores
+      if (b.product.rating !== a.product.rating) {
+        return (b.product.rating || 0) - (a.product.rating || 0);
+      }
+      
+      // Tertiary sort by reviews for same scores and ratings
+      return (b.product.reviews || 0) - (a.product.reviews || 0);
+    })
     .slice(0, searchConfig.maxResults);
 };
 
-// Auto-complete suggestions
+// Enhanced auto-complete suggestions with scoring
 export const getSearchSuggestions = (products: Product[], query: string, limit: number = 5): string[] => {
   if (!query.trim()) return [];
   
-  const suggestions = new Set<string>();
+  const suggestions = new Map<string, number>();
   const searchTerm = query.toLowerCase();
   
   products.forEach(product => {
-    // Add product names that start with the query
-    if (product.name.toLowerCase().startsWith(searchTerm)) {
-      suggestions.add(product.name);
-    }
+    // Product names with scoring
+    const nameWords = product.name.toLowerCase().split(/\s+/);
+    nameWords.forEach(word => {
+      if (word.startsWith(searchTerm)) {
+        const currentScore = suggestions.get(product.name) || 0;
+        suggestions.set(product.name, currentScore + 10); // High score for product names
+      } else if (word.includes(searchTerm)) {
+        const currentScore = suggestions.get(product.name) || 0;
+        suggestions.set(product.name, currentScore + 5);
+      }
+    });
     
-    // Add categories that start with the query
+    // Categories with scoring
     if (product.category.toLowerCase().startsWith(searchTerm)) {
-      suggestions.add(product.category);
+      const currentScore = suggestions.get(product.category) || 0;
+      suggestions.set(product.category, currentScore + 8);
+    } else if (product.category.toLowerCase().includes(searchTerm)) {
+      const currentScore = suggestions.get(product.category) || 0;
+      suggestions.set(product.category, currentScore + 4);
     }
     
-    // Add subcategories that start with the query
+    // Subcategories with scoring
     if (product.subcategory.toLowerCase().startsWith(searchTerm)) {
-      suggestions.add(product.subcategory);
+      const currentScore = suggestions.get(product.subcategory) || 0;
+      suggestions.set(product.subcategory, currentScore + 6);
     }
     
-    // Add fabrics that start with the query
+    // Fabrics with scoring
     if (product.fabric?.toLowerCase().startsWith(searchTerm)) {
-      suggestions.add(product.fabric);
+      const currentScore = suggestions.get(product.fabric) || 0;
+      suggestions.set(product.fabric, currentScore + 5);
     }
     
-    // Add occasions that start with the query
+    // Occasions with scoring
     product.occasion?.forEach(occ => {
       if (occ.toLowerCase().startsWith(searchTerm)) {
-        suggestions.add(occ);
+        const currentScore = suggestions.get(occ) || 0;
+        suggestions.set(occ, currentScore + 4);
+      } else if (occ.toLowerCase().includes(searchTerm)) {
+        const currentScore = suggestions.get(occ) || 0;
+        suggestions.set(occ, currentScore + 2);
       }
     });
     
-    // Add colors that start with the query
+    // Colors with scoring
     product.colors?.forEach(color => {
       if (color.toLowerCase().startsWith(searchTerm)) {
-        suggestions.add(color);
+        const currentScore = suggestions.get(color) || 0;
+        suggestions.set(color, currentScore + 3);
       }
     });
+    
+    // Add fuzzy matches for better suggestions
+    if (fuzzyMatch(product.name, searchTerm, 0.6)) {
+      const currentScore = suggestions.get(product.name) || 0;
+      suggestions.set(product.name, currentScore + 2);
+    }
   });
   
-  return Array.from(suggestions).slice(0, limit);
+  // Sort by score and return top suggestions
+  return Array.from(suggestions.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([suggestion]) => suggestion)
+    .slice(0, limit);
 };
 
 // Popular search terms

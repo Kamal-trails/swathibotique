@@ -90,7 +90,7 @@ export const useSearch = (): UseSearchReturn => {
     return getSearchSuggestions(allProducts, query, 5);
   }, [query, allProducts]);
 
-  // Perform search and get results
+  // Perform search and get results with optimized configuration
   const searchResults = useMemo(() => {
     if (!query.trim()) {
       return allProducts.map(product => ({
@@ -101,7 +101,15 @@ export const useSearch = (): UseSearchReturn => {
       }));
     }
     
-    return searchProducts(allProducts, query);
+    // Use optimized search configuration
+    const searchConfig = {
+      fuzzyMatch: true,
+      includeSynonyms: true,
+      minScore: 0.2, // Lower threshold for more results
+      maxResults: 100 // More results for better selection
+    };
+    
+    return searchProducts(allProducts, query, searchConfig);
   }, [query]);
 
   // Apply filters to search results

@@ -16,6 +16,7 @@ import { SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { FilterSidebar } from "@/components/filters/FilterSidebar";
 import { SearchBar } from "@/components/SearchBar";
+import { SearchResultHighlight } from "@/components/SearchResultHighlight";
 import { useSearch } from "@/hooks/useSearch";
 import { usePagination } from "@/hooks/usePagination";
 import { getFilterOptions, SORT_OPTIONS, getAllProducts } from "@/services/productService";
@@ -141,6 +142,14 @@ const Shop = () => {
                 : `Discover our exquisite range of ${totalItems} ethnic and fusion wear items`
               }
             </p>
+            
+            {/* Show search result details when searching */}
+            {currentSearchQuery && searchResults.length > 0 && (
+              <div className="mt-4 bg-muted/50 p-4 rounded-lg">
+                <h3 className="font-medium mb-2">Best Match:</h3>
+                <SearchResultHighlight result={searchResults[0]} query={currentSearchQuery} />
+              </div>
+            )}
             
             {/* Search Bar for Shop Page */}
             <div className="mt-6 max-w-md">
