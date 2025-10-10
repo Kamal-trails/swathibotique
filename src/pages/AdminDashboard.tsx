@@ -6,19 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { useProducts } from '@/contexts/ProductContext';
 import { getAllProducts } from '@/services/productService';
 
 const AdminDashboard = () => {
-  const products = getAllProducts();
+  const { getProducts, getAdminProducts } = useProducts();
+  const allProducts = getProducts();
+  const adminProducts = getAdminProducts();
   
-  // Mock statistics
+  // Real-time statistics
   const stats = {
-    totalProducts: products.length,
-    newProducts: products.filter(p => p.isNew).length,
-    totalSales: 1250,
-    totalRevenue: 2450000,
-    outOfStock: products.filter(p => !p.inStock).length,
-    highRated: products.filter(p => (p.rating || 0) >= 4.5).length
+    totalProducts: allProducts.length,
+    newProducts: allProducts.filter(p => p.isNew).length,
+    totalSales: 1250, // Mock data - would come from orders
+    totalRevenue: 2450000, // Mock data - would come from orders
+    outOfStock: allProducts.filter(p => !p.inStock).length,
+    highRated: allProducts.filter(p => (p.rating || 0) >= 4.5).length,
+    adminAdded: adminProducts.length
   };
 
   return (
@@ -56,7 +60,7 @@ const AdminDashboard = () => {
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalProducts}</div>
                 <p className="text-xs text-muted-foreground">
-                  +{stats.newProducts} new this month
+                  +{stats.adminAdded} added via admin
                 </p>
               </CardContent>
             </Card>
@@ -131,11 +135,11 @@ const AdminDashboard = () => {
           {/* Recent Products */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Products</CardTitle>
+              <CardTitle>Recent Products ({allProducts.length} total)</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {products.slice(0, 10).map((product) => (
+                {allProducts.slice(0, 10).map((product) => (
                   <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center gap-4">
                       <img

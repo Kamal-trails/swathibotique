@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, Upload, X, Eye, Save, RefreshCw } from 'lucide-react';
+import { Plus, Upload, X, Eye, Save, RefreshCw, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { useProducts } from '@/contexts/ProductContext';
+import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 import { Product, ProductCategory, ProductSubcategory, Occasion, Fabric } from '@/types/product';
 
 interface ProductFormData {
@@ -62,6 +65,7 @@ const COMMON_SIZES = [
 ];
 
 const AdminAddProduct = () => {
+  const { addProduct } = useProducts();
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     price: 0,
@@ -200,10 +204,51 @@ const AdminAddProduct = () => {
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Product Data:', { ...formData, images });
-    console.log('Generated Tags:', generatedTags);
-    // Here you would typically send the data to your backend
-    alert('Product added successfully! (Check console for data)');
+    
+    // Validate required fields
+    if (!formData.name || !formData.category || !formData.subcategory || !formData.description || formData.price <= 0) {
+      alert('Please fill in all required fields (Name, Category, Subcategory, Description, Price)');
+      return;
+    }
+
+    if (images.length === 0) {
+      alert('Please upload at least one product image');
+      return;
+    }
+
+    // Add product using the context
+    addProduct(formData, images);
+    
+    // Show success message
+    toast.success(`Product "${formData.name}" added successfully!`, {
+      description: "The product is now available in the shopping catalog.",
+      duration: 5000,
+    });
+    
+    // Reset form
+    setFormData({
+      name: '',
+      price: 0,
+      category: '',
+      subcategory: '',
+      description: '',
+      fabric: '',
+      occasion: [],
+      colors: [],
+      sizes: [],
+      isNew: false,
+      discount: 0,
+      inStock: true,
+      rating: 4.0,
+      reviews: 0,
+      careInstructions: '',
+      origin: 'Made in India',
+      sku: ''
+    });
+    setImages([]);
+    setImagePreview([]);
+    setCustomColor('');
+    setCustomSize('');
   };
 
   return (
@@ -593,7 +638,13 @@ const AdminAddProduct = () => {
                 </Tabs>
 
                 {/* Submit Button */}
-                <div className="flex justify-end">
+                <div className="flex justify-between">
+                  <Link to="/shop">
+                    <Button variant="outline" size="lg">
+                      <ExternalLink className="mr-2 h-5 w-5" />
+                      View Shop
+                    </Button>
+                  </Link>
                   <Button type="submit" size="lg" className="btn-gold">
                     <Save className="mr-2 h-5 w-5" />
                     Add Product
