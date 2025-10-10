@@ -20,14 +20,14 @@ import jewelryEarrings from "@/assets/jewelry-earrings.jpg";
 
 const Index = () => {
   const featuredProducts = [
-    { id: 1, name: "Silk Saree with Zari Work", price: 4999, image: saree1, category: "Sarees", isNew: true },
-    { id: 2, name: "Bridal Lehenga Choli", price: 15999, image: lehenga1, category: "Lehengas", discount: 20 },
-    { id: 3, name: "Anarkali Suit Set", price: 3499, image: anarkali1, category: "Salwar Suits", isNew: true },
-    { id: 4, name: "Designer Kurti with Palazzo", price: 2499, image: kurti1, category: "Kurtis" },
-    { id: 5, name: "Men's Kurta Pajama Set", price: 2999, image: mensKurta1, category: "Men's Ethnic", isNew: true },
-    { id: 6, name: "Wedding Sherwani", price: 12999, image: sherwani1, category: "Men's Bridal" },
-    { id: 7, name: "Embroidered Potli Bag", price: 799, image: potliBag, category: "Accessories", isNew: true },
-    { id: 8, name: "Kundan Jhumka Earrings", price: 1299, image: jewelryEarrings, category: "Jewelry", discount: 25 },
+    { id: 1, name: "Silk Saree with Zari Work", price: 4999, image: saree1, category: "Sarees" as const, subcategory: "Ethnic Wear" as const, isNew: true },
+    { id: 2, name: "Bridal Lehenga Choli", price: 15999, image: lehenga1, category: "Lehengas" as const, subcategory: "Bridal Wear" as const, discount: 20 },
+    { id: 3, name: "Anarkali Suit Set", price: 3499, image: anarkali1, category: "Salwar Suits" as const, subcategory: "Ethnic Wear" as const, isNew: true },
+    { id: 4, name: "Designer Kurti with Palazzo", price: 2499, image: kurti1, category: "Kurtis & Kurtas" as const, subcategory: "Ethnic Wear" as const },
+    { id: 5, name: "Men's Kurta Pajama Set", price: 2999, image: mensKurta1, category: "Men's Kurtas" as const, subcategory: "Men's Ethnic Wear" as const, isNew: true },
+    { id: 6, name: "Wedding Sherwani", price: 12999, image: sherwani1, category: "Sherwanis" as const, subcategory: "Men's Bridal Wear" as const },
+    { id: 7, name: "Embroidered Potli Bag", price: 799, image: potliBag, category: "Bags & Clutches" as const, subcategory: "Accessories" as const, isNew: true },
+    { id: 8, name: "Kundan Jhumka Earrings", price: 1299, image: jewelryEarrings, category: "Jewelry" as const, subcategory: "Accessories" as const, discount: 25 },
   ];
 
   return (

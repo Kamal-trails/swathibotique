@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { Product } from "@/types/product";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ProductCardProps {
   product: Product;
@@ -39,28 +40,47 @@ const ProductCard = ({ product }: ProductCardProps) => {
           
           {/* Hover Actions */}
           <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-            <Button
-              size="icon"
-              variant="secondary"
-              className="rounded-full opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300"
-              onClick={(e) => {
-                e.preventDefault();
-                toggleFavorite(product);
-              }}
-            >
-              <Heart className={`h-5 w-5 ${isInFavorites ? 'fill-accent text-accent' : ''}`} />
-            </Button>
-            <Button
-              size="icon"
-              variant="secondary"
-              className="rounded-full opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75"
-              onClick={(e) => {
-                e.preventDefault();
-                addToCart(product);
-              }}
-            >
-              <ShoppingBag className="h-5 w-5" />
-            </Button>
+            <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="rounded-full opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:scale-110"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleFavorite(product);
+                    }}
+                  >
+                    <Heart className={`h-5 w-5 transition-all duration-300 ${isInFavorites ? 'fill-accent text-accent' : ''}`} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-foreground text-background">
+                  <p className="font-medium">
+                    {isInFavorites ? "Added to Wishlist" : "Add to Wishlist"}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="rounded-full opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 hover:scale-110"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addToCart(product);
+                    }}
+                  >
+                    <ShoppingBag className="h-5 w-5 transition-all duration-300" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-foreground text-background">
+                  <p className="font-medium">Add to Cart</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </Link>

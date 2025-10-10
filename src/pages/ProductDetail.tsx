@@ -33,8 +33,8 @@ const ProductDetail = () => {
   };
 
   const relatedProducts = [
-    { id: 2, name: "Blush Pink Blazer", price: 249.99, image: product2, category: "Women's Wear", discount: 20 },
-    { id: 3, name: "Gold Accessories Set", price: 129.99, image: product3, category: "Accessories", isNew: true },
+    { id: 2, name: "Blush Pink Blazer", price: 249.99, image: product2, category: "Gowns" as const, subcategory: "Indo-Western" as const, discount: 20 },
+    { id: 3, name: "Gold Accessories Set", price: 129.99, image: product3, category: "Jewelry" as const, subcategory: "Accessories" as const, isNew: true },
   ];
 
   return (

@@ -4,7 +4,7 @@
  * Following DRY Principle - reusable across all components
  */
 
-import { Product, ProductFilter, SortOption, Occasion, ProductCategory, ProductSubcategory } from "@/types/product";
+import { Product, ProductFilter, SortOption, Occasion, ProductCategory, ProductSubcategory, Fabric } from "@/types/product";
 import saree1 from "@/assets/saree-1.jpg";
 import saree2 from "@/assets/saree-2.jpg";
 import lehenga1 from "@/assets/lehenga-1.jpg";
@@ -25,9 +25,10 @@ const generateProductVariations = (baseProduct: Omit<Product, 'id'>, count: numb
   const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
   
   for (let i = 0; i < count; i++) {
+    const baseId = 'id' in baseProduct ? (baseProduct as any).id : 1000;
     variations.push({
       ...baseProduct,
-      id: baseProduct.id + i,
+      id: baseId + i,
       name: `${baseProduct.name} - ${colors[i % colors.length]}`,
       price: baseProduct.price + (i * 500), // Vary price slightly
       colors: [colors[i % colors.length], colors[(i + 1) % colors.length]],
@@ -512,7 +513,7 @@ export const filterProducts = (products: Product[], filter: ProductFilter): Prod
     }
     
     // Fabric filter
-    if (filter.fabrics.length > 0 && product.fabric && !filter.fabrics.includes(product.fabric)) {
+    if (filter.fabrics.length > 0 && product.fabric && !filter.fabrics.includes(product.fabric as any)) {
       return false;
     }
     
@@ -593,7 +594,7 @@ export const getFilterOptions = (products: Product[]) => {
   const categories = [...new Set(products.map(p => p.category))];
   const subcategories = [...new Set(products.map(p => p.subcategory))];
   const occasions = [...new Set(products.flatMap(p => p.occasion || []))];
-  const fabrics = [...new Set(products.map(p => p.fabric).filter(Boolean))];
+  const fabrics = [...new Set(products.map(p => p.fabric).filter(Boolean))] as Fabric[];
   const sizes = [...new Set(products.flatMap(p => p.sizes || []))];
   const colors = [...new Set(products.flatMap(p => p.colors || []))];
   
@@ -601,7 +602,7 @@ export const getFilterOptions = (products: Product[]) => {
     categories: categories.sort(),
     subcategories: subcategories.sort(),
     occasions: occasions.sort(),
-    fabrics: fabrics.sort(),
+    fabrics: fabrics.sort() as Fabric[],
     sizes: sizes.sort(),
     colors: colors.sort()
   };
