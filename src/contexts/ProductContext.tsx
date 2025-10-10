@@ -153,7 +153,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Load initial products from service
   useEffect(() => {
     try {
+      console.log('ProductContext: Loading initial products...');
       const initialProducts = getAllProducts();
+      console.log('ProductContext: Loaded products:', initialProducts.length, initialProducts);
       dispatch({ type: 'LOAD_PRODUCTS', payload: initialProducts });
     } catch (error) {
       console.error('Error loading initial products:', error);
@@ -216,10 +218,12 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const getProducts = (): Product[] => {
+    console.log('ProductContext getProducts called, state.products:', state.products.length, state.products);
     return state.products;
   };
 
   const getAdminProducts = (): AdminProduct[] => {
+    console.log('ProductContext getAdminProducts called, state.adminProducts:', state.adminProducts.length, state.adminProducts);
     return state.adminProducts;
   };
 

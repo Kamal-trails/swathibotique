@@ -457,45 +457,53 @@ export const ALL_PRODUCTS = expandedProducts;
 
 // Get all products - now includes both static and dynamic products
 export const getAllProducts = (): Product[] => {
+  console.log('getAllProducts called');
   // Get static products
   const staticProducts = ALL_PRODUCTS;
+  console.log('Static products count:', staticProducts.length);
   
   // Get dynamic products from localStorage (added via admin)
-  const savedAdminProducts = localStorage.getItem('adminProducts');
+  // Check if we're in a browser environment
   let dynamicProducts: Product[] = [];
   
-  if (savedAdminProducts) {
-    try {
-      const adminProducts = JSON.parse(savedAdminProducts);
-      dynamicProducts = adminProducts.map((adminProduct: any) => ({
-        id: adminProduct.id,
-        name: adminProduct.name,
-        price: adminProduct.price,
-        image: adminProduct.image,
-        category: adminProduct.category,
-        subcategory: adminProduct.subcategory,
-        isNew: adminProduct.isNew,
-        discount: adminProduct.discount,
-        description: adminProduct.description,
-        images: adminProduct.images,
-        sizes: adminProduct.sizes,
-        colors: adminProduct.colors,
-        fabric: adminProduct.fabric,
-        occasion: adminProduct.occasion,
-        inStock: adminProduct.inStock,
-        rating: adminProduct.rating,
-        reviews: adminProduct.reviews,
-        sku: adminProduct.sku,
-        careInstructions: adminProduct.careInstructions,
-        origin: adminProduct.origin,
-      }));
-    } catch (error) {
-      console.error('Error loading dynamic products:', error);
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const savedAdminProducts = localStorage.getItem('adminProducts');
+    
+    if (savedAdminProducts) {
+      try {
+        const adminProducts = JSON.parse(savedAdminProducts);
+        dynamicProducts = adminProducts.map((adminProduct: any) => ({
+          id: adminProduct.id,
+          name: adminProduct.name,
+          price: adminProduct.price,
+          image: adminProduct.image,
+          category: adminProduct.category,
+          subcategory: adminProduct.subcategory,
+          isNew: adminProduct.isNew,
+          discount: adminProduct.discount,
+          description: adminProduct.description,
+          images: adminProduct.images,
+          sizes: adminProduct.sizes,
+          colors: adminProduct.colors,
+          fabric: adminProduct.fabric,
+          occasion: adminProduct.occasion,
+          inStock: adminProduct.inStock,
+          rating: adminProduct.rating,
+          reviews: adminProduct.reviews,
+          sku: adminProduct.sku,
+          careInstructions: adminProduct.careInstructions,
+          origin: adminProduct.origin,
+        }));
+      } catch (error) {
+        console.error('Error loading dynamic products:', error);
+      }
     }
   }
   
   // Combine static and dynamic products, with dynamic products first (newest)
-  return [...dynamicProducts, ...staticProducts];
+  const allProducts = [...dynamicProducts, ...staticProducts];
+  console.log('Final products count:', allProducts.length);
+  return allProducts;
 };
 
 // Sort options following Open/Closed Principle

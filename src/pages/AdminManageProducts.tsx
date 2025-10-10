@@ -42,6 +42,27 @@ const AdminManageProducts = () => {
   const allProducts = getProducts();
   const adminProducts = getAdminProducts();
   
+  // Debug logging
+  console.log('AdminManageProducts Debug:', {
+    allProductsLength: allProducts?.length,
+    adminProductsLength: adminProducts?.length,
+    allProducts: allProducts,
+    adminProducts: adminProducts
+  });
+  
+  const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set());
+  const [filters, setFilters] = useState<ProductFilters>({
+    search: '',
+    category: '',
+    status: '',
+    inStock: '',
+    isNew: ''
+  });
+  const [sortBy, setSortBy] = useState('newest');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; product: any }>({ open: false, product: null });
+  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
+
   // Use adminProducts for management, fallback to allProducts if adminProducts is empty
   const productsToManage = adminProducts && adminProducts.length > 0 ? adminProducts : (allProducts || []);
   
@@ -60,19 +81,6 @@ const AdminManageProducts = () => {
       </div>
     );
   }
-  
-  const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set());
-  const [filters, setFilters] = useState<ProductFilters>({
-    search: '',
-    category: '',
-    status: '',
-    inStock: '',
-    isNew: ''
-  });
-  const [sortBy, setSortBy] = useState('newest');
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; product: any }>({ open: false, product: null });
-  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
