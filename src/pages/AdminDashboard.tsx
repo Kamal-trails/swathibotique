@@ -119,10 +119,12 @@ const AdminDashboard = () => {
                   </Button>
                 </Link>
                 
-                <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                  <Package className="h-6 w-6" />
-                  Manage Inventory
-                </Button>
+                <Link to="/admin/manage-products">
+                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
+                    <Package className="h-6 w-6" />
+                    Manage Products
+                  </Button>
+                </Link>
                 
                 <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
                   <TrendingUp className="h-6 w-6" />

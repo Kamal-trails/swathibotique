@@ -79,6 +79,11 @@ const productReducer = (state: ProductState, action: ProductAction): ProductStat
           : product
       );
 
+      // Also update localStorage for admin products
+      if (updatedAdminProducts.length > 0) {
+        localStorage.setItem('adminProducts', JSON.stringify(updatedAdminProducts));
+      }
+
       return {
         ...state,
         products: updatedProducts,
@@ -88,10 +93,20 @@ const productReducer = (state: ProductState, action: ProductAction): ProductStat
     }
 
     case 'DELETE_PRODUCT': {
+      const updatedProducts = state.products.filter(product => product.id !== action.payload);
+      const updatedAdminProducts = state.adminProducts.filter(product => product.id !== action.payload);
+      
+      // Update localStorage for admin products
+      if (updatedAdminProducts.length > 0) {
+        localStorage.setItem('adminProducts', JSON.stringify(updatedAdminProducts));
+      } else {
+        localStorage.removeItem('adminProducts');
+      }
+
       return {
         ...state,
-        products: state.products.filter(product => product.id !== action.payload),
-        adminProducts: state.adminProducts.filter(product => product.id !== action.payload),
+        products: updatedProducts,
+        adminProducts: updatedAdminProducts,
         lastUpdated: new Date(),
       };
     }
