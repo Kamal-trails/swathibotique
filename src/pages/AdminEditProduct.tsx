@@ -96,10 +96,8 @@ const AdminEditProduct = () => {
   const [customSize, setCustomSize] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Find the product to edit - check both admin products and regular products
-  const adminProducts = getAdminProducts();
-  const productToEdit = adminProducts.find(p => p.id === parseInt(id || '0')) || 
-                       allProducts.find(p => p.id === parseInt(id || '0'));
+  // Find the product to edit
+  const productToEdit = allProducts.find(p => p.id === parseInt(id || '0'));
 
   // Load product data on mount
   useEffect(() => {
@@ -110,7 +108,7 @@ const AdminEditProduct = () => {
         category: productToEdit.category,
         subcategory: productToEdit.subcategory,
         description: productToEdit.description || '',
-        fabric: productToEdit.fabric || '',
+        fabric: (productToEdit.fabric as Fabric) || '',
         occasion: productToEdit.occasion || [],
         colors: productToEdit.colors || [],
         sizes: productToEdit.sizes || [],

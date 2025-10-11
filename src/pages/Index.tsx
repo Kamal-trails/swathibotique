@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Truck, Shield, Clock } from "lucide-react";
+import { ArrowRight, Truck, Shield, Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import { SearchBar } from "@/components/SearchBar";
+import { useSearch } from "@/hooks/useSearch";
 import heroBanner from "@/assets/hero-banner.jpg";
 import categoryEthnic from "@/assets/category-ethnic.jpg";
 import categoryBridal from "@/assets/category-bridal.jpg";
@@ -19,6 +21,18 @@ import potliBag from "@/assets/potli-bag.jpg";
 import jewelryEarrings from "@/assets/jewelry-earrings.jpg";
 
 const Index = () => {
+  const { 
+    query, 
+    setQuery, 
+    filteredProducts, 
+    suggestions, 
+    performSearch, 
+    clearSearch,
+    isSearching 
+  } = useSearch();
+
+  const popularSearches = ["Saree", "Lehenga", "Kurta", "Wedding", "Bridal"];
+
   const featuredProducts = [
     { id: 1, name: "Silk Saree with Zari Work", price: 4999, image: saree1, category: "Sarees" as const, subcategory: "Ethnic Wear" as const, isNew: true },
     { id: 2, name: "Bridal Lehenga Choli", price: 15999, image: lehenga1, category: "Lehengas" as const, subcategory: "Bridal Wear" as const, discount: 20 },
@@ -35,7 +49,56 @@ const Index = () => {
       <Navigation />
       
       <main className="flex-1">
-        {/* Hero Section */}
+        {/* Search Results Section - Shows when searching */}
+        {query && (
+          <section className="py-8 bg-background">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="font-heading text-2xl md:text-3xl font-bold mb-2">
+                    Search Results for "{query}"
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Found {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={clearSearch}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Clear Search
+                </Button>
+              </div>
+
+              {isSearching ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+                </div>
+              ) : filteredProducts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">
+                    No products found matching "{query}"
+                  </p>
+                  <Button onClick={clearSearch} variant="outline">
+                    Clear Search
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Hero Section - Hidden when searching */}
+        {!query && (
+          <>
         <section className="relative h-[600px] md:h-[700px] overflow-hidden">
           <div className="absolute inset-0">
             <img
@@ -54,6 +117,21 @@ const Index = () => {
               <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg">
                 Discover our curated collection of exquisite sarees, lehengas, and ethnic wear that celebrates Indian fashion and craftsmanship.
               </p>
+              
+              {/* Search Bar in Hero */}
+              <div className="mb-8 max-w-xl">
+                <SearchBar
+                  query={query}
+                  onQueryChange={setQuery}
+                  onSearch={performSearch}
+                  suggestions={suggestions}
+                  popularSearches={popularSearches}
+                  isSearching={isSearching}
+                  placeholder="Search sarees, lehengas, kurtas..."
+                  className="bg-white/95 backdrop-blur-sm rounded-lg"
+                />
+              </div>
+
               <div className="flex flex-wrap gap-4">
                 <Link to="/shop">
                   <Button size="lg" className="btn-gold text-base">
@@ -299,6 +377,8 @@ const Index = () => {
             </div>
           </div>
         </section>
+        </>
+        )}
       </main>
 
       <Footer />
