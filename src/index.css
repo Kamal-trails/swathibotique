@@ -11,6 +11,9 @@
 /* Import UI consistency layer (after Tailwind to override) */
 @import './styles/ui-consistency.css';
 
+/* Import icon protection layer (highest priority) */
+@import './styles/icon-protection.css';
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

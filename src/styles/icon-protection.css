@@ -1,0 +1,340 @@
+/**
+ * Icon Protection Layer
+ * Prevents CSS from interfering with lucide-react icons
+ * Makes icons look clean and consistent everywhere
+ */
+
+/* ========================================
+   GLOBAL ICON RESET
+   Remove ALL inherited styles
+   ======================================== */
+svg[class*="lucide"],
+svg.lucide,
+[class*="lucide"] > svg {
+  /* Reset all transformations */
+  transform: none !important;
+  transform-origin: center !important;
+  
+  /* Remove any CSS effects */
+  filter: none !important;
+  backdrop-filter: none !important;
+  
+  /* Reset sizing */
+  width: 1em;
+  height: 1em;
+  
+  /* Display properties */
+  display: inline-block;
+  vertical-align: middle;
+  
+  /* Prevent distortion */
+  flex-shrink: 0;
+  
+  /* Remove any borders/shadows */
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  
+  /* Reset opacity */
+  opacity: 1;
+  
+  /* Stroke properties - preserve icon design */
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  
+  /* Animation smoothing */
+  transition: color 0.2s ease, opacity 0.2s ease;
+  
+  /* Prevent CSS animations from affecting icons */
+  animation: none !important;
+}
+
+/* ========================================
+   PREVENT WRAPPER INTERFERENCE
+   ======================================== */
+button svg[class*="lucide"],
+a svg[class*="lucide"],
+div svg[class*="lucide"],
+span svg[class*="lucide"] {
+  /* Ensure icon inherits button/link color */
+  color: inherit;
+  
+  /* Remove any forced dimensions from parent */
+  width: 1em !important;
+  height: 1em !important;
+  
+  /* Prevent margin/padding from parent */
+  margin: 0;
+  padding: 0;
+}
+
+/* ========================================
+   NAVIGATION ICONS (CRITICAL)
+   Keep navigation icons pristine
+   ======================================== */
+nav svg[class*="lucide"],
+header svg[class*="lucide"] {
+  /* Perfect default size for navigation */
+  width: 20px;
+  height: 20px;
+  
+  /* Consistent stroke */
+  stroke-width: 2;
+  
+  /* Clean alignment */
+  vertical-align: middle;
+  
+  /* Remove any parent interference */
+  transform: none !important;
+}
+
+/* ========================================
+   BUTTON ICONS
+   ======================================== */
+button svg[class*="lucide"] {
+  /* Slightly smaller for inline buttons */
+  width: 1em;
+  height: 1em;
+  
+  /* Prevent button styles from affecting icon */
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  
+  /* Smooth transitions only for color */
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+/* Icon-only buttons need larger icons */
+button[size="icon"] svg[class*="lucide"],
+button.icon svg[class*="lucide"] {
+  width: 20px;
+  height: 20px;
+}
+
+/* ========================================
+   LOADING SPINNER FIX
+   ======================================== */
+svg.lucide-loader-2,
+svg[class*="lucide-loader"] {
+  animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   SIZE VARIANTS
+   Consistent sizing across app
+   ======================================== */
+
+/* Small icons (form inputs, inline text) */
+.icon-sm svg[class*="lucide"],
+svg[class*="lucide"].icon-sm {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+/* Medium icons (default - buttons, navigation) */
+.icon-md svg[class*="lucide"],
+svg[class*="lucide"].icon-md {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+/* Large icons (headings, hero sections) */
+.icon-lg svg[class*="lucide"],
+svg[class*="lucide"].icon-lg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+/* Extra large icons (empty states, feature sections) */
+.icon-xl svg[class*="lucide"],
+svg[class*="lucide"].icon-xl {
+  width: 48px;
+  height: 48px;
+  stroke-width: 1.5;
+}
+
+/* ========================================
+   HOVER STATES (Clean animations)
+   ======================================== */
+button:hover svg[class*="lucide"],
+a:hover svg[class*="lucide"] {
+  /* Only animate opacity, not transform */
+  opacity: 0.8;
+  transform: none !important;
+}
+
+/* Active state */
+button:active svg[class*="lucide"],
+a:active svg[class*="lucide"] {
+  opacity: 1;
+  transform: none !important;
+}
+
+/* ========================================
+   FOCUS STATES (Accessibility)
+   ======================================== */
+button:focus-visible svg[class*="lucide"],
+a:focus-visible svg[class*="lucide"] {
+  /* Maintain icon clarity on focus */
+  opacity: 1;
+  outline: none;
+  transform: none !important;
+}
+
+/* ========================================
+   DISABLED STATES
+   ======================================== */
+button:disabled svg[class*="lucide"],
+[disabled] svg[class*="lucide"],
+[aria-disabled="true"] svg[class*="lucide"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   SPECIFIC ICON FIXES
+   ======================================== */
+
+/* Heart icon (favorites) - prevent fill issues */
+svg.lucide-heart {
+  fill: none;
+  transition: fill 0.2s ease, color 0.2s ease;
+}
+
+svg.lucide-heart.filled,
+button[aria-pressed="true"] svg.lucide-heart {
+  fill: currentColor;
+}
+
+/* Shopping bag icon - keep consistent */
+svg.lucide-shopping-bag,
+svg.lucide-shopping-cart {
+  stroke-width: 2;
+}
+
+/* Search icon - keep circular shape */
+svg.lucide-search {
+  stroke-width: 2;
+}
+
+/* Menu/X icons (hamburger) - bold and clear */
+svg.lucide-menu,
+svg.lucide-x {
+  stroke-width: 2.5;
+}
+
+/* Arrow icons - maintain direction */
+svg.lucide-arrow-left,
+svg.lucide-arrow-right,
+svg.lucide-arrow-up,
+svg.lucide-arrow-down {
+  stroke-width: 2;
+}
+
+/* Chevron icons - consistent angles */
+svg.lucide-chevron-left,
+svg.lucide-chevron-right,
+svg.lucide-chevron-up,
+svg.lucide-chevron-down {
+  stroke-width: 2;
+}
+
+/* Check/X icons (status) - bold for visibility */
+svg.lucide-check,
+svg.lucide-check-circle,
+svg.lucide-x-circle {
+  stroke-width: 2.5;
+}
+
+/* ========================================
+   BADGE ICONS (with count overlays)
+   ======================================== */
+.relative svg[class*="lucide"] {
+  /* Ensure badge doesn't cover icon */
+  z-index: 1;
+}
+
+/* ========================================
+   DARK MODE ADJUSTMENTS
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  svg[class*="lucide"] {
+    /* Slightly thinner strokes in dark mode for better contrast */
+    stroke-width: 1.75;
+  }
+  
+  /* Bold icons stay bold */
+  svg.lucide-menu,
+  svg.lucide-x,
+  svg.lucide-check,
+  svg.lucide-check-circle {
+    stroke-width: 2.5;
+  }
+}
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+@media (max-width: 768px) {
+  /* Slightly larger touch targets on mobile */
+  nav svg[class*="lucide"],
+  button[size="icon"] svg[class*="lucide"] {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+  svg[class*="lucide"] {
+    /* Ensure icons print clearly */
+    stroke: #000 !important;
+    fill: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  svg[class*="lucide"] {
+    /* Remove all animations for accessibility */
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  /* Keep spinner for loading states */
+  svg.lucide-loader-2 {
+    animation: spin 1s linear infinite !important;
+  }
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+   ======================================== */
+@media (prefers-contrast: high) {
+  svg[class*="lucide"] {
+    /* Bolder icons for better visibility */
+    stroke-width: 2.5;
+  }
+}
+
