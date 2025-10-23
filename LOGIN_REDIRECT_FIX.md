@@ -1,5 +1,14 @@
 # Login Redirect Issue - Fixed! ✅
 
+## Updates
+
+### ✨ Latest Enhancement (Role-Based Redirect):
+- **Admin users** are now automatically redirected to `/admin` (Admin Dashboard) after login
+- **Regular users** are redirected to home `/` or their originally requested page
+- Smart redirect prevents regular users from being sent to admin routes
+
+---
+
 ## Problem Analysis
 
 ### What Was Happening:
@@ -61,11 +70,14 @@ if (result.success) {
 1. User submits login form
 2. `signIn()` is called → Supabase authenticates
 3. If successful, set `loginAttempted.current = true`
-4. State updates propagate through AuthContext
+4. State updates propagate through AuthContext (including `isAdmin` status)
 5. `useEffect` detects: `!authLoading && user && loginAttempted.current`
-6. **Only then** does navigation occur
+6. **Smart redirect logic executes:**
+   - If `isAdmin === true` → Navigate to `/admin` (Admin Dashboard)
+   - If `isAdmin === false` → Navigate to `/` (Home) or requested page
+   - If regular user tried to access admin route → Redirect to `/` instead
 7. Protected route now sees fully updated auth state
-8. User is successfully redirected! ✅
+8. User is successfully redirected to the appropriate page! ✅
 
 ## Benefits of This Approach
 
@@ -73,17 +85,31 @@ if (result.success) {
 2. ✅ **Respects React's rendering cycle** - Waits for state propagation
 3. ✅ **Clean separation of concerns** - Login logic separate from navigation logic
 4. ✅ **Uses useRef for flag** - Doesn't trigger unnecessary re-renders
-5. ✅ **Maintains redirect path** - Still respects `from` location for proper redirect after login
+5. ✅ **Role-based smart redirect** - Admins go to dashboard, users go to home
+6. ✅ **Enhanced security** - Prevents regular users from being redirected to admin routes
+7. ✅ **Better UX** - Users land on the most relevant page for their role
 
 ## Testing Checklist
 
-- [x] Login with valid credentials
+### Regular User Tests:
+- [x] Login with regular user credentials
 - [x] Verify redirect to home page (/)
 - [x] Try accessing protected route without login
-- [x] Login and verify redirect to originally requested route
-- [x] Test with admin credentials
-- [x] Verify no console errors
+- [x] Login and verify redirect to originally requested route (e.g., /profile, /cart)
+- [x] Verify regular user cannot access admin routes
 - [x] Check that loading states work properly
+
+### Admin User Tests:
+- [x] Login with admin credentials
+- [x] Verify redirect to Admin Dashboard (/admin)
+- [x] Verify admin can access all admin routes
+- [x] Verify admin badge appears in navigation
+- [x] Test admin functionality (add/edit products)
+
+### General Tests:
+- [x] Verify no console errors
+- [x] Check smooth transitions without flickering
+- [x] Test logout and re-login flow
 
 ## Additional Notes
 
@@ -97,22 +123,45 @@ if (result.success) {
 - `user !== null` → User is authenticated
 - `loginAttempted.current` → This navigation is from a login, not initial load
 
+### Role-Based Redirect Logic:
+```typescript
+if (isAdmin) {
+  // Admin users always go to dashboard
+  redirectPath = '/admin';
+} else {
+  // Regular users go to home or requested page (unless it's an admin route)
+  redirectPath = from.startsWith('/admin') ? '/' : from;
+}
+```
+
+This ensures:
+- ✅ Admins have quick access to dashboard
+- ✅ Regular users can't be redirected to admin pages
+- ✅ Regular users still get redirected to their originally requested page (if it's not admin)
+
 ### Edge Cases Handled:
 1. **User already logged in** - Won't navigate (loginAttempted is false)
 2. **Login fails** - Flag is reset to false
 3. **Multiple rapid login attempts** - Flag prevents multiple navigations
 4. **Component unmounts** - useEffect cleanup prevents memory leaks
+5. **Regular user tries admin route** - Redirected to home instead
+6. **Admin accessing any route** - Always sent to dashboard first
 
 ## Files Modified
 
-- ✅ `src/pages/Login.tsx` - Added useEffect-based navigation logic
+- ✅ `src/pages/Login.tsx` - Added useEffect-based navigation logic with role-based redirect
+  - Now uses `isAdmin` from auth context
+  - Implements smart redirect based on user role
+  - Admins → `/admin` dashboard
+  - Regular users → `/` home or requested page (excluding admin routes)
 
 ## Files Reviewed (No Changes Needed)
 
-- ✅ `src/contexts/AuthContext.tsx` - Working correctly
-- ✅ `src/components/ProtectedRoute.tsx` - Working correctly
-- ✅ `src/services/authService.ts` - Working correctly
+- ✅ `src/contexts/AuthContext.tsx` - Provides `isAdmin` status correctly
+- ✅ `src/components/ProtectedRoute.tsx` - Working correctly with admin protection
+- ✅ `src/services/authService.ts` - Handles `checkIsAdmin` correctly
 - ✅ `src/pages/Signup.tsx` - No issue (navigates to public route)
+- ✅ `src/pages/AdminDashboard.tsx` - Protected by requireAdmin flag
 
 ## Related Documentation
 

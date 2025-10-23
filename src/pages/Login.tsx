@@ -18,7 +18,7 @@ import Footer from '@/components/Footer';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, user, loading: authLoading } = useAuth();
+  const { signIn, user, isAdmin, loading: authLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -29,15 +29,27 @@ const Login = () => {
   const [error, setError] = useState('');
   const loginAttempted = useRef(false);
 
-  // Get the redirect path from location state, default to home
+  // Get the redirect path from location state
   const from = (location.state as any)?.from?.pathname || '/';
 
-  // Redirect when user is authenticated after login attempt
+  // Smart redirect based on user role after login attempt
   useEffect(() => {
     if (!authLoading && user && loginAttempted.current) {
-      navigate(from, { replace: true });
+      // Determine redirect destination based on user role
+      let redirectPath: string;
+      
+      if (isAdmin) {
+        // Admin users → redirect to admin dashboard
+        redirectPath = '/admin';
+      } else {
+        // Regular users → redirect to home or requested page
+        // If they tried to access an admin route, send them to home instead
+        redirectPath = from.startsWith('/admin') ? '/' : from;
+      }
+      
+      navigate(redirectPath, { replace: true });
     }
-  }, [user, authLoading, navigate, from]);
+  }, [user, isAdmin, authLoading, navigate, from]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
