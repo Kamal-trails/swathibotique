@@ -179,6 +179,32 @@ export const ProgressLoader: React.FC<{
   );
 };
 
+// Page content skeleton (for full page layouts)
+export const PageSkeleton: React.FC = () => {
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-6">
+      <Skeleton className="h-10 w-64 mb-8" />
+      <div className="grid gap-6">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Card key={i}>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-32 mt-2" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Empty state (not loading, but no data)
 export const EmptyState: React.FC<{
   icon?: React.ReactNode;
