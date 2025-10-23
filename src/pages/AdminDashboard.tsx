@@ -1,18 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Package, Users, ShoppingCart, TrendingUp, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Package, Users, ShoppingCart, TrendingUp, Eye, Edit, Trash2, BarChart3, Settings, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SyncStatusCard from '@/components/SyncStatusCard';
 import { useProducts } from '@/contexts/ProductContextClean';
+import { useInventory } from '@/contexts/InventoryContext';
 
 const AdminDashboard = () => {
   const { products, isLoading, error } = useProducts();
+  const { analytics: inventoryAnalytics } = useInventory();
   const allProducts = products;
   
-  // Real-time statistics
+  // Real-time statistics with null safety
   const stats = {
     totalProducts: allProducts.length,
     newProducts: allProducts.filter(p => p.isNew).length,
@@ -20,7 +23,11 @@ const AdminDashboard = () => {
     totalRevenue: 2450000, // Mock data - would come from orders
     outOfStock: allProducts.filter(p => !p.inStock).length,
     highRated: allProducts.filter(p => (p.rating || 0) >= 4.5).length,
-    adminAdded: allProducts.filter(p => p.id > 1000).length // Admin products have higher IDs
+    adminAdded: allProducts.filter(p => p.id > 1000).length, // Admin products have higher IDs
+    // Inventory stats with null safety
+    inventoryValue: inventoryAnalytics?.totalValue || 0,
+    lowStockItems: inventoryAnalytics?.lowStockItems || 0,
+    totalInventoryItems: inventoryAnalytics?.totalProducts || 0
   };
 
   // Loading state
@@ -100,26 +107,26 @@ const AdminDashboard = () => {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Inventory Value</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalSales}</div>
+                <div className="text-2xl font-bold">₹{stats.inventoryValue.toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground">
-                  +12% from last month
+                  Total inventory worth
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Low Stock Alert</CardTitle>
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-orange-600">{stats.lowStockItems}</div>
                 <p className="text-xs text-muted-foreground">
-                  +8% from last month
+                  Items need restocking
                 </p>
               </CardContent>
             </Card>
@@ -138,38 +145,49 @@ const AdminDashboard = () => {
             </Card>
           </div>
 
+          {/* Sync Status Card */}
+          <div className="mb-8">
+            <SyncStatusCard />
+          </div>
+
           {/* Quick Actions */}
           <Card className="mb-8">
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link to="/admin/add-product">
-                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                    <Plus className="h-6 w-6" />
-                    Add Product
+                  <Button variant="outline" className="w-full h-24 flex flex-col gap-2 hover:bg-accent/50">
+                    <Plus className="h-8 w-8" />
+                    <span className="font-semibold">Add Product</span>
+                    <span className="text-xs text-muted-foreground">Create new product</span>
                   </Button>
                 </Link>
                 
                 <Link to="/admin/manage-products">
-                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                    <Package className="h-6 w-6" />
-                    Manage Products
+                  <Button variant="outline" className="w-full h-24 flex flex-col gap-2 hover:bg-accent/50">
+                    <Package className="h-8 w-8" />
+                    <span className="font-semibold">Manage Products</span>
+                    <span className="text-xs text-muted-foreground">{stats.totalProducts} products</span>
                   </Button>
                 </Link>
                 
                 <Link to="/admin/inventory">
-                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                    <TrendingUp className="h-6 w-6" />
-                    Inventory
+                  <Button variant="outline" className="w-full h-24 flex flex-col gap-2 hover:bg-accent/50">
+                    <TrendingUp className="h-8 w-8" />
+                    <span className="font-semibold">Inventory</span>
+                    <span className="text-xs text-muted-foreground">{stats.totalInventoryItems} items tracked</span>
                   </Button>
                 </Link>
                 
-                <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                  <TrendingUp className="h-6 w-6" />
-                  View Analytics
-                </Button>
+                <Link to="/admin/inventory">
+                  <Button variant="outline" className="w-full h-24 flex flex-col gap-2 hover:bg-accent/50">
+                    <BarChart3 className="h-8 w-8" />
+                    <span className="font-semibold">Analytics</span>
+                    <span className="text-xs text-muted-foreground">View reports</span>
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

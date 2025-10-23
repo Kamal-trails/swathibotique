@@ -18,6 +18,8 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useProducts } from '@/contexts/ProductContextClean';
 import { toast } from 'sonner';
+import { validateProduct, validateImageFile } from '@/utils/validation';
+import { createAppError, logError } from '@/utils/errorHandling';
 
 const CATEGORIES = [
   "Sarees", "Lehengas", "Salwar Suits", "Kurtis & Kurtas", "Gowns",
@@ -129,10 +131,38 @@ const AdminAddProductClean = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Handle image upload
+  // Handle image upload with validation
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setImages(files);
+    
+    // Validate each image file
+    const validFiles: File[] = [];
+    let hasErrors = false;
+    
+    files.forEach(file => {
+      const validation = validateImageFile(file);
+      
+      if (!validation.isValid) {
+        validation.errors.forEach(error => toast.error(`${file.name}: ${error}`));
+        hasErrors = true;
+      } else {
+        validFiles.push(file);
+        
+        // Show warnings
+        validation.warnings.forEach(warning => toast.warning(`${file.name}: ${warning}`));
+      }
+    });
+    
+    if (validFiles.length > 0) {
+      setImages(validFiles);
+      if (hasErrors) {
+        toast.info(`${validFiles.length} of ${files.length} images were valid`);
+      } else {
+        toast.success(`${validFiles.length} image(s) selected`);
+      }
+    } else if (files.length > 0) {
+      toast.error('No valid images selected');
+    }
   };
 
   // Toggle occasion
@@ -177,31 +207,44 @@ const AdminAddProductClean = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!formData.name || !formData.category || !formData.subcategory || !formData.description || formData.price <= 0) {
-      toast.error('Please fill in all required fields (Name, Category, Subcategory, Description, Price)');
+    // Create product object for validation
+    const productToValidate = {
+      name: formData.name,
+      price: formData.price,
+      category: formData.category,
+      subcategory: formData.subcategory,
+      description: formData.description,
+      fabric: formData.fabric,
+      occasion: formData.occasion,
+      colors: formData.colors,
+      sizes: formData.sizes,
+      discount: formData.discount,
+      rating: formData.rating,
+      reviews: formData.reviews,
+      sku: formData.sku,
+      images: images.map(f => f.name) // Temporary for validation
+    };
+    
+    // Comprehensive validation
+    const validation = validateProduct(productToValidate);
+    
+    // Show validation errors
+    if (!validation.isValid) {
+      validation.errors.forEach(error => toast.error(error));
       return;
     }
-
-    // Validate inventory fields
-    if (formData.inventory.currentStock < 0 || formData.inventory.minimumStock < 0 || formData.inventory.maximumStock < 0) {
-      toast.error('Stock quantities cannot be negative');
-      return;
-    }
-
+    
+    // Show validation warnings (non-blocking)
+    validation.warnings.forEach(warning => toast.warning(warning));
+    
+    // Additional inventory validation
     if (formData.inventory.minimumStock > formData.inventory.maximumStock) {
       toast.error('Minimum stock cannot be greater than maximum stock');
       return;
     }
-
-    if (formData.inventory.costPrice < 0) {
-      toast.error('Cost price cannot be negative');
-      return;
-    }
-
-    if (images.length === 0) {
-      toast.error('Please upload at least one product image');
-      return;
+    
+    if (formData.inventory.costPrice > formData.price) {
+      toast.warning('Cost price is higher than selling price - you will have a negative margin');
     }
 
     try {
@@ -269,11 +312,22 @@ const AdminAddProductClean = () => {
 
       await addProduct(newProduct, images);
       
-      toast.success(`Product "${formData.name}" added successfully!`);
+      // Auto-sync product to inventory
+      const { syncProductToInventory } = await import('@/services/productInventorySync');
+      const syncResult = syncProductToInventory(newProduct as any);
+      
+      if (syncResult) {
+        toast.success(`Product "${formData.name}" added successfully with inventory tracking!`);
+      } else {
+        toast.success(`Product "${formData.name}" added successfully!`);
+        toast.warning('Inventory sync failed - please sync manually from inventory dashboard');
+      }
+      
       navigate('/admin/manage-products');
     } catch (error) {
-      console.error('Error adding product:', error);
-      toast.error('Failed to add product. Please try again.');
+      const appError = createAppError(error, 'Adding product');
+      logError(appError, { productName: formData.name, category: formData.category });
+      toast.error(appError.userMessage);
     } finally {
       setIsSubmitting(false);
     }

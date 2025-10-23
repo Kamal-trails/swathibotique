@@ -240,6 +240,17 @@ export const InventoryProvider: React.FC<InventoryProviderProps> = ({ children }
       if (success) {
         // Refresh data
         await refreshData();
+        
+        // Sync inventory back to product
+        try {
+          const { syncInventoryToProduct } = await import('@/services/productInventorySync');
+          const item = inventoryItems.find(i => i.productId === productId);
+          if (item) {
+            syncInventoryToProduct(item);
+          }
+        } catch (err) {
+          console.warn('Failed to sync inventory to product:', err);
+        }
       }
       
       return success;

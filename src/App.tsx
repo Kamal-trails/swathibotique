@@ -10,6 +10,7 @@ import { ProductProvider } from "./contexts/ProductContextClean";
 import { InventoryProvider } from "./contexts/InventoryContext";
 import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
@@ -37,16 +38,17 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <ProductProvider>
-          <InventoryProvider>
-            <CartProvider>
-              <FavoritesProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <Routes>
+      <ErrorBoundary>
+        <AuthProvider>
+          <ProductProvider>
+            <InventoryProvider>
+              <CartProvider>
+                <FavoritesProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/shop" element={<Shop />} />
@@ -130,7 +132,7 @@ const App = () => (
             </CartProvider>
           </InventoryProvider>
         </ProductProvider>
-      </AuthProvider>
+      </ErrorBoundary>
     </TooltipProvider>
   </QueryClientProvider>
 );
