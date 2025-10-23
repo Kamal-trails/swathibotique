@@ -6,9 +6,11 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Truck, Shield, RotateCcw, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import product1 from "@/assets/product-1.jpg";
-import product2 from "@/assets/product-2.jpg";
-import product3 from "@/assets/product-3.jpg";
+
+// Use string paths instead of imports to avoid Rollup build issues
+const product1 = "/src/assets/product-1.jpg";
+const product2 = "/src/assets/product-2.jpg";
+const product3 = "/src/assets/product-3.jpg";
 
 const ProductDetail = () => {
   const { id } = useParams();

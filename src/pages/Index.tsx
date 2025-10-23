@@ -6,19 +6,21 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { SearchBar } from "@/components/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
-import heroBanner from "@/assets/hero-banner.jpg";
-import categoryEthnic from "@/assets/category-ethnic.jpg";
-import categoryBridal from "@/assets/category-bridal.jpg";
-import categoryMens from "@/assets/category-mens.jpg";
-import categoryAccessories from "@/assets/category-accessories.jpg";
-import saree1 from "@/assets/saree-1.jpg";
-import lehenga1 from "@/assets/lehenga-1.jpg";
-import anarkali1 from "@/assets/anarkali-1.jpg";
-import kurti1 from "@/assets/kurti-1.jpg";
-import mensKurta1 from "@/assets/mens-kurta-1.jpg";
-import sherwani1 from "@/assets/sherwani-1.jpg";
-import potliBag from "@/assets/potli-bag.jpg";
-import jewelryEarrings from "@/assets/jewelry-earrings.jpg";
+
+// Use string paths instead of imports to avoid Rollup build issues
+const heroBanner = "/src/assets/hero-banner.jpg";
+const categoryEthnic = "/src/assets/category-ethnic.jpg";
+const categoryBridal = "/src/assets/category-bridal.jpg";
+const categoryMens = "/src/assets/category-mens.jpg";
+const categoryAccessories = "/src/assets/category-accessories.jpg";
+const saree1 = "/src/assets/saree-1.jpg";
+const lehenga1 = "/src/assets/lehenga-1.jpg";
+const anarkali1 = "/src/assets/anarkali-1.jpg";
+const kurti1 = "/src/assets/kurti-1.jpg";
+const mensKurta1 = "/src/assets/mens-kurta-1.jpg";
+const sherwani1 = "/src/assets/sherwani-1.jpg";
+const potliBag = "/src/assets/potli-bag.jpg";
+const jewelryEarrings = "/src/assets/jewelry-earrings.jpg";
 
 const Index = () => {
   const { 

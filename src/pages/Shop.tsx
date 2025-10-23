@@ -21,18 +21,20 @@ import { useSearch } from "@/hooks/useSearch";
 import { usePagination } from "@/hooks/usePagination";
 import { getFilterOptions, SORT_OPTIONS, getAllProducts } from "@/services/productService";
 import { getPopularSearches } from "@/services/searchService";
-import saree1 from "@/assets/saree-1.jpg";
-import saree2 from "@/assets/saree-2.jpg";
-import lehenga1 from "@/assets/lehenga-1.jpg";
-import anarkali1 from "@/assets/anarkali-1.jpg";
-import kurti1 from "@/assets/kurti-1.jpg";
-import mensKurta1 from "@/assets/mens-kurta-1.jpg";
-import sherwani1 from "@/assets/sherwani-1.jpg";
-import potliBag from "@/assets/potli-bag.jpg";
-import jewelryEarrings from "@/assets/jewelry-earrings.jpg";
-import dupatta1 from "@/assets/dupatta-1.jpg";
-import kidsLehenga from "@/assets/kids-lehenga.jpg";
-import indoWesternGown from "@/assets/indo-western-gown.jpg";
+
+// Use string paths instead of imports to avoid Rollup build issues
+const saree1 = "/src/assets/saree-1.jpg";
+const saree2 = "/src/assets/saree-2.jpg";
+const lehenga1 = "/src/assets/lehenga-1.jpg";
+const anarkali1 = "/src/assets/anarkali-1.jpg";
+const kurti1 = "/src/assets/kurti-1.jpg";
+const mensKurta1 = "/src/assets/mens-kurta-1.jpg";
+const sherwani1 = "/src/assets/sherwani-1.jpg";
+const potliBag = "/src/assets/potli-bag.jpg";
+const jewelryEarrings = "/src/assets/jewelry-earrings.jpg";
+const dupatta1 = "/src/assets/dupatta-1.jpg";
+const kidsLehenga = "/src/assets/kids-lehenga.jpg";
+const indoWesternGown = "/src/assets/indo-western-gown.jpg";
 
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
