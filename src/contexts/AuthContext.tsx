@@ -46,14 +46,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadUserProfile = async (user: SupabaseUser) => {
     try {
       console.log('⚡ Loading profile for user:', user.id);
+      console.log('⚡ FULL USER OBJECT:', JSON.stringify(user, null, 2));
       console.log('⚡ User app_metadata:', user.app_metadata);
+      console.log('⚡ User user_metadata:', user.user_metadata);
+      console.log('⚡ is_super_admin value:', user.app_metadata?.is_super_admin);
+      console.log('⚡ is_super_admin type:', typeof user.app_metadata?.is_super_admin);
       
       const profile = await getUserProfile(user.id);
       console.log('📋 Profile loaded:', profile);
       
       // PASS USER OBJECT DIRECTLY to avoid hanging
       const isAdmin = await checkIsAdmin(user.id, user);
-      console.log('🎯 Is admin:', isAdmin);
+      console.log('🎯🎯🎯 FINAL ADMIN STATUS:', isAdmin);
       
       setState(prev => ({
         ...prev,
