@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, ArrowRight, ShoppingBag, Loader2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Trash2, ArrowRight, ShoppingBag, Loader2, RefreshCw } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { PageSkeleton } from "@/components/LoadingStates";
 import { toast } from "sonner";
