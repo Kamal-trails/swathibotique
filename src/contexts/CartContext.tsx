@@ -1,6 +1,15 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { Product } from '@/types/product';
+import { useAuth } from './AuthContext';
+import {
+  getUserCart,
+  addToCartDB,
+  updateCartQuantityDB,
+  removeFromCartDB,
+  clearCartDB,
+  mergeGuestCartToUserCart,
+} from '@/services/userActivitiesService';
 
 // Cart Item interface
 export interface CartItem {
@@ -19,6 +28,8 @@ interface CartState {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
+  isLoading: boolean;
+  isSyncing: boolean;
 }
 
 // Cart Actions
@@ -27,13 +38,17 @@ type CartAction =
   | { type: 'REMOVE_FROM_CART'; payload: number }
   | { type: 'UPDATE_QUANTITY'; payload: { id: number; quantity: number } }
   | { type: 'CLEAR_CART' }
-  | { type: 'LOAD_CART'; payload: CartItem[] };
+  | { type: 'LOAD_CART'; payload: CartItem[] }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SYNCING'; payload: boolean };
 
 // Initial state
 const initialState: CartState = {
   items: [],
   totalItems: 0,
   totalPrice: 0,
+  isLoading: false,
+  isSyncing: false,
 };
 
 // Cart reducer
@@ -102,13 +117,29 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     }
 
     case 'CLEAR_CART':
-      return initialState;
+      return { ...initialState };
 
     case 'LOAD_CART': {
       return {
+        ...state,
         items: action.payload,
         totalItems: action.payload.reduce((sum, item) => sum + item.quantity, 0),
         totalPrice: action.payload.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        isLoading: false,
+      };
+    }
+
+    case 'SET_LOADING': {
+      return {
+        ...state,
+        isLoading: action.payload,
+      };
+    }
+
+    case 'SET_SYNCING': {
+      return {
+        ...state,
+        isSyncing: action.payload,
       };
     }
 
@@ -120,11 +151,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 // Cart Context interface
 interface CartContextType {
   state: CartState;
-  addToCart: (product: Product, size?: string, color?: string) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
-  clearCart: () => void;
+  addToCart: (product: Product, size?: string, color?: string) => Promise<void>;
+  removeFromCart: (id: number) => Promise<void>;
+  updateQuantity: (id: number, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   isInCart: (id: number, size?: string, color?: string) => boolean;
+  refreshCart: () => Promise<void>;
 }
 
 // Create context
@@ -133,26 +165,121 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 // Cart Provider component
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const { user } = useAuth();
+  const hasMergedRef = useRef(false);
+  const isInitializedRef = useRef(false);
 
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
+  // Load cart from localStorage (for guests) or database (for authenticated users)
+  const loadCart = async () => {
+    if (user) {
+      // Load from database
+      console.log('🛒 Loading cart from database for user:', user.id);
+      dispatch({ type: 'SET_LOADING', payload: true });
+      
       try {
-        const cartItems = JSON.parse(savedCart);
+        const cartItems = await getUserCart(user.id);
+        console.log('✅ Loaded cart from database:', cartItems.length, 'items');
         dispatch({ type: 'LOAD_CART', payload: cartItems });
       } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
+        console.error('❌ Error loading cart from database:', error);
+        toast.error('Failed to load cart');
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
+    } else {
+      // Load from localStorage (guest user)
+      console.log('🛒 Loading cart from localStorage (guest)');
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        try {
+          const cartItems = JSON.parse(savedCart);
+          dispatch({ type: 'LOAD_CART', payload: cartItems });
+        } catch (error) {
+          console.error('Error loading cart from localStorage:', error);
+        }
+      }
+    }
+  };
+
+  // Merge localStorage cart to database on login
+  const mergeLocalStorageToDatabase = async () => {
+    if (!user || hasMergedRef.current) return;
+
+    console.log('🔄 Merging localStorage cart to database...');
+    dispatch({ type: 'SET_SYNCING', payload: true });
+
+    const localCart = localStorage.getItem('cart');
+    if (localCart) {
+      try {
+        const cartItems: CartItem[] = JSON.parse(localCart);
+        
+        if (cartItems.length > 0) {
+          console.log(`📤 Merging ${cartItems.length} cart items to database...`);
+          
+          const success = await mergeGuestCartToUserCart(user.id, cartItems);
+          
+          if (success) {
+            console.log('✅ Cart merged successfully');
+            toast.success(`${cartItems.length} items synced to your cart!`);
+            
+            // Clear localStorage after successful merge
+            localStorage.removeItem('cart');
+          }
+        }
+        
+        hasMergedRef.current = true;
+      } catch (error) {
+        console.error('❌ Error merging cart:', error);
+        toast.error('Failed to sync cart');
+      }
+    } else {
+      hasMergedRef.current = true;
+    }
+    
+    dispatch({ type: 'SET_SYNCING', payload: false });
+  };
+
+  // Initial load on mount
+  useEffect(() => {
+    if (!isInitializedRef.current) {
+      loadCart();
+      isInitializedRef.current = true;
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Handle user login/logout
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.items));
-  }, [state.items]);
+    const handleUserChange = async () => {
+      if (user) {
+        // User logged in
+        console.log('👤 User logged in, syncing cart...');
+        
+        // First merge any localStorage cart
+        await mergeLocalStorageToDatabase();
+        
+        // Then load from database
+        await loadCart();
+      } else {
+        // User logged out
+        console.log('👋 User logged out, loading guest cart...');
+        hasMergedRef.current = false;
+        await loadCart();
+      }
+    };
 
-  const addToCart = (product: Product, size?: string, color?: string) => {
+    if (isInitializedRef.current) {
+      handleUserChange();
+    }
+  }, [user?.id]); // Only trigger on user ID change
+
+  // Save to localStorage for guests (not for authenticated users)
+  useEffect(() => {
+    if (!user && state.items.length >= 0) {
+      localStorage.setItem('cart', JSON.stringify(state.items));
+    }
+  }, [state.items, user]);
+
+  // Add to cart
+  const addToCart = async (product: Product, size?: string, color?: string) => {
     const cartItem: Omit<CartItem, 'quantity'> = {
       id: product.id,
       name: product.name,
@@ -162,28 +289,125 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       size,
       color,
     };
+    
+    // Optimistic update
     dispatch({ type: 'ADD_TO_CART', payload: cartItem });
-    toast.success(`${product.name} added to cart!`);
+    
+    if (user) {
+      // Save to database
+      try {
+        const success = await addToCartDB(user.id, product, size, color, 1);
+        if (success) {
+          console.log('✅ Added to cart in database:', product.name);
+          toast.success(`${product.name} added to cart!`);
+        } else {
+          // Rollback on failure
+          dispatch({ type: 'REMOVE_FROM_CART', payload: product.id });
+          toast.error('Failed to add to cart');
+        }
+      } catch (error) {
+        console.error('❌ Error adding to cart:', error);
+        // Rollback on error
+        dispatch({ type: 'REMOVE_FROM_CART', payload: product.id });
+        toast.error('Failed to add to cart');
+      }
+    } else {
+      // Guest user - just show toast
+      toast.success(`${product.name} added to cart!`);
+    }
   };
 
-  const removeFromCart = (id: number) => {
+  // Remove from cart
+  const removeFromCart = async (id: number) => {
+    const item = state.items.find(item => item.id === id);
+    
+    // Optimistic update
     dispatch({ type: 'REMOVE_FROM_CART', payload: id });
+    
+    if (user && item) {
+      // Remove from database
+      try {
+        const success = await removeFromCartDB(user.id, id, item.size, item.color);
+        if (success) {
+          console.log('✅ Removed from cart in database:', id);
+        } else {
+          // Rollback on failure
+          dispatch({ type: 'ADD_TO_CART', payload: item });
+          toast.error('Failed to remove from cart');
+        }
+      } catch (error) {
+        console.error('❌ Error removing from cart:', error);
+        // Rollback on error
+        dispatch({ type: 'ADD_TO_CART', payload: item });
+        toast.error('Failed to remove from cart');
+      }
+    }
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
+  // Update quantity
+  const updateQuantity = async (id: number, quantity: number) => {
+    const oldItem = state.items.find(item => item.id === id);
+    
+    // Optimistic update
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
+    
+    if (user && oldItem) {
+      // Update in database
+      try {
+        const success = await updateCartQuantityDB(user.id, id, quantity, oldItem.size, oldItem.color);
+        if (!success) {
+          // Rollback on failure
+          dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity: oldItem.quantity } });
+          toast.error('Failed to update quantity');
+        }
+      } catch (error) {
+        console.error('❌ Error updating quantity:', error);
+        // Rollback on error
+        dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity: oldItem.quantity } });
+        toast.error('Failed to update quantity');
+      }
+    }
   };
 
-  const clearCart = () => {
+  // Clear cart
+  const clearCart = async () => {
+    const oldItems = state.items;
+    
+    // Optimistic update
     dispatch({ type: 'CLEAR_CART' });
+    
+    if (user) {
+      // Clear in database
+      try {
+        const success = await clearCartDB(user.id);
+        if (!success) {
+          // Rollback on failure
+          dispatch({ type: 'LOAD_CART', payload: oldItems });
+          toast.error('Failed to clear cart');
+        }
+      } catch (error) {
+        console.error('❌ Error clearing cart:', error);
+        // Rollback on error
+        dispatch({ type: 'LOAD_CART', payload: oldItems });
+        toast.error('Failed to clear cart');
+      }
+    } else {
+      localStorage.removeItem('cart');
+    }
   };
 
+  // Check if item is in cart
   const isInCart = (id: number, size?: string, color?: string): boolean => {
     return state.items.some(item => 
       item.id === id && 
       item.size === size && 
       item.color === color
     );
+  };
+
+  // Refresh cart from database
+  const refreshCart = async () => {
+    await loadCart();
   };
 
   const value: CartContextType = {
@@ -193,6 +417,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateQuantity,
     clearCart,
     isInCart,
+    refreshCart,
   };
 
   return (

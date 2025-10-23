@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
+import { OrderProvider } from "./contexts/OrderContext";
 import { ProductProvider } from "./contexts/ProductContextClean";
 import { InventoryProvider } from "./contexts/InventoryContext";
 import ScrollToTop from "./components/ScrollToTop";
@@ -16,6 +17,7 @@ import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Favorites from "./pages/Favorites";
+import OrderHistory from "./pages/OrderHistory";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
@@ -44,8 +46,9 @@ const App = () => (
             <InventoryProvider>
               <CartProvider>
                 <FavoritesProvider>
-                <Toaster />
-                <Sonner />
+                  <OrderProvider>
+                    <Toaster />
+                    <Sonner />
                 <BrowserRouter>
                   <ScrollToTop />
                   <Routes>
@@ -79,6 +82,11 @@ const App = () => (
                 <Route path="/wishlist" element={
                   <ProtectedRoute>
                     <Favorites />
+                  </ProtectedRoute>
+                } />
+                <Route path="/orders" element={
+                  <ProtectedRoute>
+                    <OrderHistory />
                   </ProtectedRoute>
                 } />
                 
@@ -128,6 +136,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </BrowserRouter>
+                  </OrderProvider>
               </FavoritesProvider>
             </CartProvider>
           </InventoryProvider>
