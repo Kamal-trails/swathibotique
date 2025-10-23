@@ -82,17 +82,25 @@ export const signOut = async () => {
 };
 
 /**
- * Get user profile from profiles table
+ * Get user profile from profiles table with timeout
  */
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
     console.log('getUserProfile: Fetching profile for user:', userId);
     
-    const { data, error } = await supabase
+    // Create a timeout promise (5 seconds)
+    const timeoutPromise = new Promise<null>((_, reject) => {
+      setTimeout(() => reject(new Error('Profile query timeout after 5 seconds')), 5000);
+    });
+    
+    // Race between the query and timeout
+    const queryPromise = supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
+    
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
 
     console.log('getUserProfile: Query completed. Data:', data, 'Error:', error);
 
@@ -104,6 +112,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     return data as UserProfile;
   } catch (error) {
     console.error('Error getting user profile:', error);
+    // Return null instead of throwing - app will work without profile
     return null;
   }
 };
@@ -166,12 +175,28 @@ export const resetPassword = async (email: string) => {
 };
 
 /**
- * Check if user is admin
+ * Check if user is admin with timeout protection
  */
 export const checkIsAdmin = async (userId: string): Promise<boolean> => {
   try {
-    const profile = await getUserProfile(userId);
-    return profile?.role === 'admin';
+    console.log('checkIsAdmin: Checking admin status for user:', userId);
+    
+    // Use a timeout to prevent hanging
+    const timeoutPromise = new Promise<boolean>((resolve) => {
+      setTimeout(() => {
+        console.warn('checkIsAdmin: Timeout - assuming not admin');
+        resolve(false);
+      }, 3000);
+    });
+    
+    const checkPromise = (async () => {
+      const profile = await getUserProfile(userId);
+      return profile?.role === 'admin';
+    })();
+    
+    const isAdmin = await Promise.race([checkPromise, timeoutPromise]);
+    console.log('checkIsAdmin: Result:', isAdmin);
+    return isAdmin;
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;
