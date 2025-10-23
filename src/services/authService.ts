@@ -175,44 +175,60 @@ export const resetPassword = async (email: string) => {
 };
 
 /**
- * Check if user is admin - SIMPLE AND DIRECT
- * Just checks the user's app_metadata from the current session
+ * Check if user is admin - INSTANT CHECK
+ * Accepts user object directly to avoid hanging on auth calls
  */
-export const checkIsAdmin = async (userId: string): Promise<boolean> => {
+export const checkIsAdmin = async (userId: string, user?: any): Promise<boolean> => {
   try {
-    console.log('🔍 checkIsAdmin: Checking admin status for user:', userId);
+    console.log('🔍 checkIsAdmin: START - Checking admin for:', userId);
     
-    // Get current user session - this is fast and has app_metadata
-    const { data: { user }, error } = await supabase.auth.getUser();
+    let currentUser = user;
     
-    if (error) {
-      console.error('❌ checkIsAdmin: Error fetching user:', error);
+    // If user not provided, try to get it with timeout
+    if (!currentUser) {
+      console.log('⏱️ No user provided, fetching with 2-second timeout...');
+      
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('getUser timeout')), 2000);
+      });
+      
+      const getUserPromise = supabase.auth.getUser();
+      
+      try {
+        const result = await Promise.race([getUserPromise, timeoutPromise]) as any;
+        currentUser = result?.data?.user;
+        console.log('✅ Got user from fetch');
+      } catch (err) {
+        console.error('❌ Timeout or error fetching user, returning false');
+        return false;
+      }
+    } else {
+      console.log('✅ User object provided directly');
+    }
+    
+    if (!currentUser) {
+      console.log('❌ No user found');
       return false;
     }
     
-    if (!user) {
-      console.log('❌ checkIsAdmin: No user found');
-      return false;
-    }
-    
-    console.log('👤 checkIsAdmin: User object:', {
-      id: user.id,
-      email: user.email,
-      app_metadata: user.app_metadata,
-      is_super_admin: user.app_metadata?.is_super_admin
+    console.log('👤 User metadata:', {
+      id: currentUser.id,
+      email: currentUser.email,
+      app_metadata: currentUser.app_metadata,
+      is_super_admin: currentUser.app_metadata?.is_super_admin
     });
     
     // Check is_super_admin from app_metadata
-    const isAdmin = user.app_metadata?.is_super_admin === true;
+    const isAdmin = currentUser.app_metadata?.is_super_admin === true;
     
-    console.log(isAdmin ? '✅ USER IS ADMIN!' : '❌ USER IS NOT ADMIN', {
-      is_super_admin: user.app_metadata?.is_super_admin,
+    console.log(isAdmin ? '✅✅✅ USER IS ADMIN! ✅✅✅' : '❌ USER IS NOT ADMIN', {
+      is_super_admin: currentUser.app_metadata?.is_super_admin,
       result: isAdmin
     });
     
     return isAdmin;
   } catch (error) {
-    console.error('❌ Error checking admin status:', error);
+    console.error('❌ Error in checkIsAdmin:', error);
     return false;
   }
 };

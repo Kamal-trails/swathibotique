@@ -45,12 +45,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load user profile
   const loadUserProfile = async (user: SupabaseUser) => {
     try {
-      console.log('Loading profile for user:', user.id);
-      const profile = await getUserProfile(user.id);
-      console.log('Profile loaded:', profile);
+      console.log('⚡ Loading profile for user:', user.id);
+      console.log('⚡ User app_metadata:', user.app_metadata);
       
-      const isAdmin = await checkIsAdmin(user.id);
-      console.log('Is admin:', isAdmin);
+      const profile = await getUserProfile(user.id);
+      console.log('📋 Profile loaded:', profile);
+      
+      // PASS USER OBJECT DIRECTLY to avoid hanging
+      const isAdmin = await checkIsAdmin(user.id, user);
+      console.log('🎯 Is admin:', isAdmin);
       
       setState(prev => ({
         ...prev,
@@ -60,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading: false,
       }));
     } catch (error) {
-      console.error('Error loading user profile:', error);
+      console.error('❌ Error loading user profile:', error);
       // Set user anyway, even if profile loading fails
       setState(prev => ({
         ...prev,
