@@ -221,7 +221,7 @@ export const InventoryProvider: React.FC<InventoryProviderProps> = ({ children }
   };
 
   // Update stock
-  const updateStock = async (
+  const updateStockOperation = async (
     productId: number, 
     quantity: number, 
     type: 'in' | 'out' | 'adjustment', 
@@ -233,7 +233,9 @@ export const InventoryProvider: React.FC<InventoryProviderProps> = ({ children }
       setIsUpdating(true);
       setError(null);
       
-      const success = await Promise.resolve(updateStock(productId, quantity, type, reason, performedBy, notes));
+      // Import and use the service function (not recursive!)
+      const { updateStock: updateStockService } = await import('@/services/inventoryService');
+      const success = updateStockService(productId, quantity, type, reason, performedBy, notes);
       
       if (success) {
         // Refresh data
@@ -258,7 +260,7 @@ export const InventoryProvider: React.FC<InventoryProviderProps> = ({ children }
     performedBy: string = 'admin', 
     notes: string = ''
   ): Promise<boolean> => {
-    return updateStock(productId, newQuantity, 'adjustment', reason, performedBy, notes);
+    return updateStockOperation(productId, newQuantity, 'adjustment', reason, performedBy, notes);
   };
 
   // Reserve stock
@@ -346,12 +348,14 @@ export const InventoryProvider: React.FC<InventoryProviderProps> = ({ children }
   };
 
   // Acknowledge alert
-  const acknowledgeAlert = async (alertId: string, acknowledgedBy: string): Promise<boolean> => {
+  const acknowledgeAlertOperation = async (alertId: string, acknowledgedBy: string): Promise<boolean> => {
     try {
       setIsUpdating(true);
       setError(null);
       
-      const success = await Promise.resolve(acknowledgeAlert(alertId, acknowledgedBy));
+      // Import and use the service function (not recursive!)
+      const { acknowledgeAlert: acknowledgeAlertService } = await import('@/services/inventoryService');
+      const success = acknowledgeAlertService(alertId, acknowledgedBy);
       
       if (success) {
         // Refresh alerts
@@ -448,11 +452,11 @@ export const InventoryProvider: React.FC<InventoryProviderProps> = ({ children }
     addInventoryItem,
     updateInventoryItem,
     deleteInventoryItem,
-    updateStock,
+    updateStock: updateStockOperation,
     adjustStock,
     reserveStock,
     releaseReservedStock,
-    acknowledgeAlert,
+    acknowledgeAlert: acknowledgeAlertOperation,
     dismissAlert,
     updateSettings,
     refreshData,
