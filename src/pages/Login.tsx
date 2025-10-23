@@ -34,6 +34,8 @@ const Login = () => {
 
   // Smart redirect based on user role after login attempt
   useEffect(() => {
+    console.log('Login useEffect:', { authLoading, user: !!user, isAdmin, loginAttempted: loginAttempted.current });
+    
     if (!authLoading && user && loginAttempted.current) {
       // Determine redirect destination based on user role
       let redirectPath: string;
@@ -41,12 +43,18 @@ const Login = () => {
       if (isAdmin) {
         // Admin users → redirect to admin dashboard
         redirectPath = '/admin';
+        console.log('Redirecting admin to:', redirectPath);
       } else {
         // Regular users → redirect to home or requested page
         // If they tried to access an admin route, send them to home instead
         redirectPath = from.startsWith('/admin') ? '/' : from;
+        console.log('Redirecting user to:', redirectPath);
       }
       
+      // Reset the flag to prevent multiple redirects
+      loginAttempted.current = false;
+      
+      console.log('Navigating to:', redirectPath);
       navigate(redirectPath, { replace: true });
     }
   }, [user, isAdmin, authLoading, navigate, from]);
@@ -80,22 +88,27 @@ const Login = () => {
     }
 
     try {
+      console.log('Attempting login...');
       const result = await signIn({
         email: formData.email,
         password: formData.password,
       });
 
+      console.log('Sign in result:', result);
+
       if (result.success) {
+        console.log('Login successful! Setting loginAttempted flag to true');
         // Mark that login was attempted successfully
         // The useEffect will handle navigation once auth state is fully updated
         loginAttempted.current = true;
       } else {
+        console.log('Login failed:', result.error);
         setError(result.error || 'Invalid email or password');
         loginAttempted.current = false;
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
       console.error('Login error:', err);
+      setError('An unexpected error occurred. Please try again.');
       loginAttempted.current = false;
     } finally {
       setLoading(false);

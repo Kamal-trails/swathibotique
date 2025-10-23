@@ -49,8 +49,6 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
       // Get products from clean data service
       const allProducts = getAllProducts();
       setProducts(allProducts);
-      
-      console.log('ProductContext: Loaded products successfully:', allProducts.length);
     } catch (err) {
       console.error('ProductContext: Error loading products:', err);
       setError(err instanceof Error ? err.message : 'Failed to load products');

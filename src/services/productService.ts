@@ -457,10 +457,8 @@ export const ALL_PRODUCTS = expandedProducts;
 
 // Get all products - now includes both static and dynamic products
 export const getAllProducts = (): Product[] => {
-  console.log('getAllProducts called');
   // Get static products
   const staticProducts = ALL_PRODUCTS;
-  console.log('Static products count:', staticProducts.length);
   
   // Get dynamic products from localStorage (added via admin)
   // Check if we're in a browser environment
@@ -502,7 +500,6 @@ export const getAllProducts = (): Product[] => {
   
   // Combine static and dynamic products, with dynamic products first (newest)
   const allProducts = [...dynamicProducts, ...staticProducts];
-  console.log('Final products count:', allProducts.length);
   return allProducts;
 };
 
