@@ -8,9 +8,11 @@
    BUTTON CONSISTENCY
    Override/enhance Tailwind button classes
    ======================================== */
-.btn,
-.button,
-[class*="btn-"] {
+
+/* Exclude navigation and icon buttons from base styling */
+.btn:not(nav .btn):not([size="icon"]),
+.button:not(nav .button):not([size="icon"]),
+[class*="btn-"]:not(nav [class*="btn-"]):not([size="icon"]) {
   /* Ensure minimum touch target */
   min-height: var(--touch-target-min);
   min-width: var(--touch-target-min);
@@ -29,9 +31,9 @@
   backface-visibility: hidden;
 }
 
-/* Primary button consistency */
-.btn-gold,
-.btn-primary {
+/* Primary button consistency - exclude navigation */
+.btn-gold:not(nav .btn-gold),
+.btn-primary:not(nav .btn-primary) {
   background-color: var(--color-accent);
   color: var(--color-accent-text);
   border-radius: var(--radius-md);
@@ -39,14 +41,14 @@
   padding: var(--space-3) var(--space-6);
 }
 
-.btn-gold:hover,
-.btn-primary:hover {
+.btn-gold:not(nav .btn-gold):hover,
+.btn-primary:not(nav .btn-primary):hover {
   background-color: var(--color-accent-hover);
   transform: translateY(-1px);
 }
 
-.btn-gold:active,
-.btn-primary:active {
+.btn-gold:not(nav .btn-gold):active,
+.btn-primary:not(nav .btn-primary):active {
   transform: translateY(0);
 }
 
@@ -169,34 +171,9 @@ h3:not([class]) {
 /* ========================================
    NAVIGATION CONSISTENCY
    ======================================== */
-nav {
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: var(--z-sticky);
-}
 
-nav a {
-  text-decoration: none;
-  transition: var(--transition-colors);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  min-height: var(--touch-target-min);
-  display: inline-flex;
-  align-items: center;
-}
-
-nav a:hover {
-  background-color: var(--color-primary-50);
-  color: var(--color-accent);
-}
-
-nav a:focus-visible {
-  outline: var(--outline-focus);
-  outline-offset: var(--outline-offset-focus);
-}
+/* Don't override navigation - let it keep its own styles */
+/* Navigation is already well-styled and working perfectly */
 
 /* ========================================
    PRODUCT CARD CONSISTENCY
