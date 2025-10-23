@@ -86,11 +86,15 @@ export const signOut = async () => {
  */
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
+    console.log('getUserProfile: Fetching profile for user:', userId);
+    
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
+
+    console.log('getUserProfile: Query completed. Data:', data, 'Error:', error);
 
     if (error) {
       console.error('Error fetching profile:', error);

@@ -41,16 +41,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load user profile
   const loadUserProfile = async (user: SupabaseUser) => {
-    const profile = await getUserProfile(user.id);
-    const isAdmin = await checkIsAdmin(user.id);
-    
-    setState(prev => ({
-      ...prev,
-      user,
-      profile,
-      isAdmin,
-      loading: false,
-    }));
+    try {
+      console.log('Loading profile for user:', user.id);
+      const profile = await getUserProfile(user.id);
+      console.log('Profile loaded:', profile);
+      
+      const isAdmin = await checkIsAdmin(user.id);
+      console.log('Is admin:', isAdmin);
+      
+      setState(prev => ({
+        ...prev,
+        user,
+        profile,
+        isAdmin,
+        loading: false,
+      }));
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      // Set user anyway, even if profile loading fails
+      setState(prev => ({
+        ...prev,
+        user,
+        profile: null,
+        isAdmin: false,
+        loading: false,
+      }));
+    }
   };
 
   // Initialize auth state
