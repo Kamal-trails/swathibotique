@@ -132,6 +132,7 @@ const App = () => (
             </CartProvider>
           </InventoryProvider>
         </ProductProvider>
+      </AuthProvider>
       </ErrorBoundary>
     </TooltipProvider>
   </QueryClientProvider>
