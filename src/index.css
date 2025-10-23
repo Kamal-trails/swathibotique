@@ -1,3 +1,9 @@
+/* Import design system foundation */
+@import './styles/design-tokens.css';
+@import './styles/reset.css';
+@import './styles/grid.css';
+
+/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
