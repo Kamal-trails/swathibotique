@@ -3,7 +3,7 @@
  * Manages global authentication state and provides auth functions
  */
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { AuthState, LoginCredentials, SignupCredentials, UserProfile, UpdateProfileData } from '@/types/auth';
@@ -38,6 +38,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading: true,
     isAdmin: false,
   });
+  
+  // Track if we're currently in a manual sign-in to prevent duplicate profile loading
+  const isSigningIn = useRef(false);
 
   // Load user profile
   const loadUserProfile = async (user: SupabaseUser) => {
@@ -81,8 +84,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔔 Auth state changed:', event);
+      
+      // Skip SIGNED_IN if we're in the middle of manual signIn
+      if (event === 'SIGNED_IN' && isSigningIn.current) {
+        console.log('⏭️ Skipping onAuthStateChange - handled by signIn function');
+        return;
+      }
+      
+      // Handle SIGNED_OUT event
+      if (event === 'SIGNED_OUT') {
+        console.log('👋 User signed out');
+        setState({
+          user: null,
+          profile: null,
+          loading: false,
+          isAdmin: false,
+        });
+        return;
+      }
+      
+      // Handle other auth state changes
       if (session?.user) {
+        console.log('👤 Loading profile from onAuthStateChange');
         await loadUserProfile(session.user);
       } else {
         setState({
@@ -100,20 +125,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Sign in
   const signIn = async (credentials: LoginCredentials) => {
     try {
+      isSigningIn.current = true; // Mark that we're signing in
+      
       const { data, error } = await authSignIn(credentials);
       
       if (error) {
+        isSigningIn.current = false;
         return { success: false, error: error.message };
       }
 
       if (data.user) {
         await loadUserProfile(data.user);
+        isSigningIn.current = false; // Reset flag after profile loaded
         toast.success('Welcome back!');
         return { success: true };
       }
 
+      isSigningIn.current = false;
       return { success: false, error: 'Login failed' };
     } catch (error) {
+      isSigningIn.current = false;
       const message = error instanceof Error ? error.message : 'An error occurred';
       return { success: false, error: message };
     }

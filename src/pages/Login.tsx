@@ -34,27 +34,32 @@ const Login = () => {
 
   // Smart redirect based on user role after login attempt
   useEffect(() => {
+    // Skip if already redirected or not attempting login
+    if (!loginAttempted.current) {
+      return;
+    }
+    
     console.log('Login useEffect:', { authLoading, user: !!user, isAdmin, loginAttempted: loginAttempted.current });
     
-    if (!authLoading && user && loginAttempted.current) {
+    if (!authLoading && user) {
       // Determine redirect destination based on user role
       let redirectPath: string;
       
       if (isAdmin) {
         // Admin users → redirect to admin dashboard
         redirectPath = '/admin';
-        console.log('Redirecting admin to:', redirectPath);
+        console.log('✅ Redirecting admin to:', redirectPath);
       } else {
         // Regular users → redirect to home or requested page
         // If they tried to access an admin route, send them to home instead
         redirectPath = from.startsWith('/admin') ? '/' : from;
-        console.log('Redirecting user to:', redirectPath);
+        console.log('✅ Redirecting user to:', redirectPath);
       }
       
-      // Reset the flag to prevent multiple redirects
+      // Reset the flag BEFORE navigation to prevent loops
       loginAttempted.current = false;
       
-      console.log('Navigating to:', redirectPath);
+      console.log('🚀 Navigating to:', redirectPath);
       navigate(redirectPath, { replace: true });
     }
   }, [user, isAdmin, authLoading, navigate, from]);
