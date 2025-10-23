@@ -8,6 +8,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import UI consistency layer (after Tailwind to override) */
+@import './styles/ui-consistency.css';
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
