@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
+import EmailConfirmation from "./pages/EmailConfirmation";
 import UserProfile from "./pages/UserProfile";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAddProduct from "./pages/AdminAddProductClean";
@@ -59,6 +60,8 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/auth/callback" element={<EmailConfirmation />} />
+                <Route path="/email-confirmation" element={<EmailConfirmation />} />
                 
                 {/* Protected Customer Routes */}
                 <Route path="/profile" element={
