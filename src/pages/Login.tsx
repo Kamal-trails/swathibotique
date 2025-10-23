@@ -3,7 +3,7 @@
  * User authentication page with email/password login
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import Footer from '@/components/Footer';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -27,9 +27,17 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const loginAttempted = useRef(false);
 
   // Get the redirect path from location state, default to home
   const from = (location.state as any)?.from?.pathname || '/';
+
+  // Redirect when user is authenticated after login attempt
+  useEffect(() => {
+    if (!authLoading && user && loginAttempted.current) {
+      navigate(from, { replace: true });
+    }
+  }, [user, authLoading, navigate, from]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -66,14 +74,17 @@ const Login = () => {
       });
 
       if (result.success) {
-        // Redirect to the page they tried to access or home
-        navigate(from, { replace: true });
+        // Mark that login was attempted successfully
+        // The useEffect will handle navigation once auth state is fully updated
+        loginAttempted.current = true;
       } else {
         setError(result.error || 'Invalid email or password');
+        loginAttempted.current = false;
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('Login error:', err);
+      loginAttempted.current = false;
     } finally {
       setLoading(false);
     }
