@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, ArrowRight, ShoppingBag, Loader2, RefreshCw } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { PageSkeleton } from "@/components/LoadingStates";
+import { FullPageLoader } from "@/components/LoadingStates";
 import { toast } from "sonner";
 
 const Cart = () => {
@@ -66,7 +66,7 @@ const Cart = () => {
       <div className="min-h-screen flex flex-col">
         <Navigation />
         <main className="flex-1">
-          <PageSkeleton />
+          <FullPageLoader message="Loading your cart..." />
         </main>
         <Footer />
       </div>
