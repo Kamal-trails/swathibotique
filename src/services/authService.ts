@@ -175,28 +175,64 @@ export const resetPassword = async (email: string) => {
 };
 
 /**
- * Check if user is admin with timeout protection
+ * Check if user is admin by checking auth.users.is_super_admin
+ * Uses PostgreSQL RPC function to query auth.users table
  */
 export const checkIsAdmin = async (userId: string): Promise<boolean> => {
   try {
     console.log('checkIsAdmin: Checking admin status for user:', userId);
     
-    // Use a timeout to prevent hanging
+    // Create timeout promise
     const timeoutPromise = new Promise<boolean>((resolve) => {
       setTimeout(() => {
-        console.warn('checkIsAdmin: Timeout - assuming not admin');
+        console.warn('checkIsAdmin: ⏱️ Timeout after 3 seconds - assuming not admin');
         resolve(false);
       }, 3000);
     });
     
-    const checkPromise = (async () => {
-      const profile = await getUserProfile(userId);
-      return profile?.role === 'admin';
+    // Method 1: Try RPC function (if it exists)
+    const rpcPromise = (async () => {
+      const { data: isAdmin, error: rpcError } = await supabase
+        .rpc('is_user_admin', { user_id: userId });
+      
+      if (!rpcError && isAdmin !== null) {
+        console.log('checkIsAdmin: ✅ Admin via RPC:', isAdmin);
+        return isAdmin;
+      }
+      
+      // Method 2: Check app_metadata from current session
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (!userError && user) {
+        const isAdminFromMeta = user.app_metadata?.is_super_admin === true;
+        if (isAdminFromMeta) {
+          console.log('checkIsAdmin: ✅ Admin via app_metadata');
+          return true;
+        }
+      }
+      
+      // Method 3: Fallback to profiles table (if exists)
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .maybeSingle(); // Use maybeSingle to avoid error if table doesn't exist
+      
+      if (!profileError && profileData) {
+        const isAdminFromProfile = profileData.role === 'admin';
+        console.log('checkIsAdmin: Result from profiles:', isAdminFromProfile);
+        return isAdminFromProfile;
+      }
+      
+      console.log('checkIsAdmin: ❌ Not admin or unable to verify');
+      return false;
     })();
     
-    const isAdmin = await Promise.race([checkPromise, timeoutPromise]);
-    console.log('checkIsAdmin: Result:', isAdmin);
-    return isAdmin;
+    // Race between check and timeout
+    const result = await Promise.race([rpcPromise, timeoutPromise]);
+    console.log('checkIsAdmin: Final result:', result);
+    return result;
+    
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;
