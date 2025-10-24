@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SyncStatusCard from '@/components/SyncStatusCard';
-import { useProducts } from '@/contexts/ProductContextClean';
+import { useProducts } from '@/contexts/ProductContext';
 import { useInventory } from '@/contexts/InventoryContext';
 
 const AdminDashboard = () => {
