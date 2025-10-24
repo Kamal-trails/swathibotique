@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { useProducts } from '@/contexts/ProductContextClean';
+import { useProducts } from '@/contexts/ProductContext';
 import { toast } from 'sonner';
 import { Product, ProductCategory, ProductSubcategory, Occasion, Fabric } from '@/types/product';
 

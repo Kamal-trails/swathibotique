@@ -7,7 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
 import { OrderProvider } from "./contexts/OrderContext";
-import { ProductProvider } from "./contexts/ProductContextClean";
+import { ProductProvider } from "./contexts/ProductContext";
 import { InventoryProvider } from "./contexts/InventoryContext";
 import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -26,12 +26,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import UserProfile from "./pages/UserProfile";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminAddProduct from "./pages/AdminAddProductClean";
-import AdminManageProducts from "./pages/AdminManageProductsClean";
+import AdminAddProduct from "./pages/AdminAddProduct";
+import AdminManageProducts from "./pages/AdminManageProducts";
 import AdminEditProduct from "./pages/AdminEditProduct";
-import AdminManageProductsTest from "./pages/AdminManageProductsTest";
-import AdminManageProductsMinimal from "./pages/AdminManageProductsMinimal";
-import AdminManageProductsNoContext from "./pages/AdminManageProductsNoContext";
 import InventoryDashboard from "./pages/InventoryDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -104,21 +101,6 @@ const App = () => (
                 <Route path="/admin/manage-products" element={
                   <ProtectedRoute requireAdmin>
                     <AdminManageProducts />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/manage-products-test" element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminManageProductsTest />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/manage-products-minimal" element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminManageProductsMinimal />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/manage-products-no-context" element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminManageProductsNoContext />
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/edit-product/:id" element={
