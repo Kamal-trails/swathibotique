@@ -11,7 +11,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <h3 className="font-heading text-2xl font-bold mb-4">
-              JAANU <span className="text-accent">BOUTIQUE</span>
+              Swathi <span className="text-accent">Botique</span>
             </h3>
             <p className="text-muted-foreground mb-4">
               Celebrating India's rich textile heritage through exquisite sarees, lehengas, and ethnic wear.
@@ -110,7 +110,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span>hello@jaanuboutique.com</span>
+                <span>hello@swathibotique.com</span>
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2025 JAANU BOUTIQUE. All rights reserved.
+            © 2025 Swathi Botique. All rights reserved.
           </p>
           <div className="flex gap-4 text-sm text-muted-foreground">
             <a href="#" className="hover:text-accent transition-colors">Terms of Service</a>

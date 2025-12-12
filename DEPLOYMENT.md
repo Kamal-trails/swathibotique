@@ -1,7 +1,7 @@
-# 🚀 JAANU BOUTIQUE - Deployment Guide
+# 🚀 Swathi Botique - Deployment Guide
 
 ## 📋 Overview
-This guide covers deploying the JAANU BOUTIQUE React SPA to various hosting platforms with proper SPA routing support.
+This guide covers deploying the Swathi Botique React SPA to various hosting platforms with proper SPA routing support.
 
 ## 🔧 SPA Routing Fix
 The project includes configurations to fix the common "SPA Refresh 404" problem where direct URL access or page refresh results in 404 errors.
@@ -81,7 +81,7 @@ npm run deploy
 3. Reload nginx configuration
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/jaanuboutique /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/swathibotique /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -129,7 +129,7 @@ npm run lint
 ## 📁 File Structure
 
 ```
-jaanuboutique-elegant-shop/
+swathibotique-elegant-shop/
 ├── vercel.json              # Vercel configuration
 ├── netlify.toml             # Netlify configuration
 ├── nginx.conf               # Nginx configuration
@@ -145,8 +145,8 @@ jaanuboutique-elegant-shop/
 For production, consider setting:
 
 ```env
-VITE_API_URL=https://api.jaanuboutique.com
-VITE_APP_NAME=JAANU BOUTIQUE
+VITE_API_URL=https://api.swathibotique.com
+VITE_APP_NAME=Swathi Botique
 VITE_APP_VERSION=1.0.0
 ```
 
@@ -185,4 +185,4 @@ If you encounter issues:
 
 **Happy Deploying! 🎉**
 
-Your JAANU BOUTIQUE is now ready for production with proper SPA routing support!
+Your Swathi Botique is now ready for production with proper SPA routing support!

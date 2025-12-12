@@ -109,7 +109,7 @@ const EmailConfirmation = () => {
               {status === 'success' && (
                 <div className="space-y-4">
                   <p className="text-sm text-center text-muted-foreground">
-                    Your email has been successfully verified. You can now access all features of JAANU BOUTIQUE.
+                    Your email has been successfully verified. You can now access all features of Swathi Botique.
                   </p>
                   <Button 
                     onClick={() => navigate('/login')} 

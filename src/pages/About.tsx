@@ -22,11 +22,11 @@ const About = () => {
         <section className="py-20 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <h2 className="font-heading text-3xl md:text-4xl font-bold mb-8 text-center">
-              Welcome to JAANU BOUTIQUE
+              Welcome to Swathi Botique
             </h2>
             <div className="prose prose-lg max-w-none space-y-6 text-muted-foreground">
               <p className="text-lg leading-relaxed">
-                Founded with a passion for preserving and celebrating Indian ethnic fashion, JAANU BOUTIQUE has been 
+                Founded with a passion for preserving and celebrating Indian ethnic fashion, Swathi Botique has been 
                 curating exquisite sarees, lehengas, and traditional wear for the discerning connoisseur. Our journey 
                 began with a simple vision: to create a destination where India's rich textile heritage meets 
                 contemporary style, and every piece tells a story of craftsmanship.
@@ -108,7 +108,7 @@ const About = () => {
         <section className="py-20 bg-gradient-to-r from-boutique-cream to-boutique-rose/30">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6">
-              Join the JAANU Family
+              Join the Swathi Family
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               Experience the richness of Indian ethnic fashion with a boutique that celebrates tradition and craftsmanship.

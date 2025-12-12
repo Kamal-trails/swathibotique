@@ -5,4 +5,4 @@
 # /old-page    /new-page    301
 
 # Optional: Force HTTPS (recommended for production)
-# http://jaanuboutique.com/*    https://jaanuboutique.com/:splat    301!
+# http://swathibotique.com/*    https://swathibotique.com/:splat    301!

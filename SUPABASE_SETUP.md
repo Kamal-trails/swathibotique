@@ -1,6 +1,6 @@
 # Supabase Setup Guide
 
-This guide will help you set up Supabase authentication and database for JAANU BOUTIQUE.
+This guide will help you set up Supabase authentication and database for Swathi Botique.
 
 ## 📋 Prerequisites
 

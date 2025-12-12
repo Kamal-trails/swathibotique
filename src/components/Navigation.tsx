@@ -113,7 +113,7 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <h1 className="text-2xl font-heading font-bold tracking-tight">
-              JAANU <span className="text-accent">BOUTIQUE</span>
+              Swathi <span className="text-accent">Botique</span>
             </h1>
           </Link>
 

@@ -1,5 +1,5 @@
 -- ========================================
--- JAANU BOUTIQUE - COMPLETE DATABASE SETUP
+-- Swathi Botique - COMPLETE DATABASE SETUP
 -- Run this entire file in Supabase SQL Editor
 -- ========================================
 -- This will enable:

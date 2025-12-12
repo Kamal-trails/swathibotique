@@ -1,4 +1,4 @@
-# Jaanu Boutique E-Commerce Platform
+# Swathi Botique E-Commerce Platform
 
 A full-featured e-commerce platform for ethnic Indian wear, built with modern web technologies.
 

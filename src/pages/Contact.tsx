@@ -159,8 +159,8 @@ const Contact = () => {
                   <div>
                     <h3 className="font-heading font-semibold mb-1">Email Us</h3>
                     <p className="text-muted-foreground">
-                      hello@jaanuboutique.com<br />
-                      support@jaanuboutique.com
+                      hello@swathibotique.com<br />
+                      support@swathibotique.com
                     </p>
                   </div>
                 </div>
